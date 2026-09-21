@@ -165,9 +165,8 @@
       <div class="discount-card">
         <label for="discount-input">Descuento para el cliente (opcional)</label>
         <div class="discount-input-wrap">
-          <span>$</span>
-          <input type="number" id="discount-input" min="0" step="1000" placeholder="0">
-          <span>COP</span>
+          <input type="number" id="discount-input" min="0" max="100" step="0.5" placeholder="0">
+          <span>%</span>
         </div>
       </div>
 
@@ -187,7 +186,7 @@
           <span class="amt"><span class="cop mono" id="detail-costo-cop">$0</span><span class="usd mono" id="detail-costo-usd">US$0</span></span>
         </div>
         <div class="detail-row discount" id="detail-descuento-row" style="display:none;">
-          <span>Descuento aplicado</span>
+          <span id="detail-descuento-label">Descuento aplicado</span>
           <span class="amt"><span class="cop mono" id="detail-descuento-cop">−$0</span><span class="usd mono" id="detail-descuento-usd">−US$0</span></span>
         </div>
         <div class="detail-row">
@@ -239,7 +238,7 @@ let taxRate = 0;
 let activeCategory = null;
 let searchQuery = '';
 let cart = []; // [{ productId, qty }]
-let discount = 0; // descuento manual para el cliente, en COP
+let discountPct = 0; // descuento manual para el cliente, en % sobre el valor total
 
 function formatCOP(n) {
   return '$' + Math.round(n).toLocaleString('es-CO').replace(/,/g, '.');
@@ -426,7 +425,7 @@ function renderCart() {
     if (p.reference_price_cop == null) hasRef = false;
     else totalRef += p.reference_price_cop * entry.qty;
   });
-  const appliedDiscount = Math.min(discount, totalSale);
+  const appliedDiscount = totalSale * (discountPct / 100);
   const finalTotal = totalSale - appliedDiscount;
   const totalGanancia = finalTotal - totalCosto;
 
@@ -440,6 +439,7 @@ function renderCart() {
   const descuentoRow = document.getElementById('detail-descuento-row');
   if (appliedDiscount > 0) {
     descuentoRow.style.display = 'flex';
+    document.getElementById('detail-descuento-label').textContent = `Descuento aplicado (${discountPct}%)`;
     document.getElementById('detail-descuento-cop').textContent = '−' + formatCOP(appliedDiscount);
     document.getElementById('detail-descuento-usd').textContent = '−' + formatUSD(appliedDiscount / trm);
   } else {
@@ -493,7 +493,7 @@ async function buildQuoteCanvas() {
     const p = products.find(pr => pr.id === entry.productId);
     return s + calcProduct(p).saleCop * entry.qty;
   }, 0);
-  const appliedDiscount = Math.min(discount, totalSale);
+  const appliedDiscount = totalSale * (discountPct / 100);
   const finalTotal = totalSale - appliedDiscount;
 
   const W = 1080, headerH = 300, itemLineH = 56;
@@ -528,7 +528,7 @@ async function buildQuoteCanvas() {
   if (appliedDiscount > 0) {
     y += 4;
     ctx.fillStyle = '#99282A'; ctx.font = '700 30px Poppins';
-    ctx.fillText(`Descuento El Casillero de USA: −${formatCOP(appliedDiscount)}`, W / 2, y);
+    ctx.fillText(`Descuento El Casillero de USA (${discountPct}%): −${formatCOP(appliedDiscount)}`, W / 2, y);
     y += discountH - 4;
   }
 
@@ -587,7 +587,7 @@ document.getElementById('search-input').addEventListener('input', (e) => {
 });
 document.getElementById('discount-input').addEventListener('input', (e) => {
   const v = parseFloat(e.target.value);
-  discount = isNaN(v) || v < 0 ? 0 : v;
+  discountPct = isNaN(v) ? 0 : Math.min(100, Math.max(0, v));
   renderCart();
 });
 document.getElementById('share-btn').addEventListener('click', shareQuoteImage);
