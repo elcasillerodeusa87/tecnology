@@ -26,8 +26,13 @@
     padding:20px 20px 18px;position:sticky;top:0;z-index:10;}
   header .eyebrow{color:#A9C6EA;font-size:11px;font-weight:700;letter-spacing:1.5px;}
   header h1{margin:4px 0 0;font-size:22px;font-weight:800;}
-  header .trm{margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);
+  header .trm{margin-top:10px;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);
     padding:6px 12px;border-radius:9px;font-size:12.5px;font-weight:700;}
+  header .trm-refresh{border:none;background:transparent;color:#fff;display:flex;align-items:center;padding:0;}
+  header .trm-refresh svg{display:block;}
+  header .trm-refresh.spinning svg{animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  header .trm-note{margin-top:6px;font-size:11px;color:#A9C6EA;font-weight:400;}
 
   main{flex-grow:1;display:flex;flex-direction:column;padding:16px;gap:16px;}
 
@@ -105,7 +110,13 @@
   <header>
     <div class="eyebrow">EL CASILLERO DE USA</div>
     <h1>Cotizador</h1>
-    <div class="trm" id="trm-badge">TRM: —</div>
+    <div class="trm" id="trm-badge">
+      <span id="trm-text">TRM: —</span>
+      <button class="trm-refresh" id="trm-refresh" aria-label="Actualizar TRM">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+      </button>
+    </div>
+    <div class="trm-note" id="trm-note"></div>
   </header>
 
   <main id="main">
@@ -156,11 +167,16 @@
 const SUPABASE_URL = 'https://eqpervrsaozztikplvqq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxcGVydnJzYW96enRpa3BsdnFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4NDA0NzgsImV4cCI6MjEwMDQxNjQ3OH0.FhFQROpEYe9XfdHOKYn5IBBdv-xBArnxY1JGkdIbj_4';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const TRM_SOURCE_URL = 'https://open.er-api.com/v6/latest/USD';
+const TRM_MARKUP = 150; // pesos por encima del valor de mercado, para el precio de venta
 
 let categories = [];
 let products = [];
 let tiers = [];
-let trm = 0;
+let trm = 0;          // TRM operativa (la que se usa para calcular precios) = mercado + TRM_MARKUP
+let marketTrm = null; // TRM de mercado tal cual la reporta la API, solo para mostrar
+let trmSource = 'loading'; // 'live' | 'manual' | 'loading'
+let manualTrmFallback = 0;
 let taxRate = 0;
 
 let activeCategory = null;
@@ -201,9 +217,48 @@ async function loadData() {
   categories = cats;
   products = prods;
   tiers = tierRows;
-  trm = settings.find(s => s.key === 'trm').value;
+  manualTrmFallback = settings.find(s => s.key === 'trm').value;
   taxRate = settings.find(s => s.key === 'tax_rate').value;
   activeCategory = categories[0] ? categories[0].id : null;
+}
+
+async function fetchLiveTRM() {
+  const res = await fetch(TRM_SOURCE_URL);
+  if (!res.ok) throw new Error('TRM: respuesta no válida');
+  const data = await res.json();
+  const rate = data && data.rates && data.rates.COP;
+  if (!rate) throw new Error('TRM: sin dato de COP');
+  return rate;
+}
+
+async function refreshTRM() {
+  const refreshBtn = document.getElementById('trm-refresh');
+  if (refreshBtn) refreshBtn.classList.add('spinning');
+  try {
+    marketTrm = await fetchLiveTRM();
+    trm = marketTrm + TRM_MARKUP;
+    trmSource = 'live';
+  } catch (err) {
+    console.error('No se pudo obtener la TRM en vivo, usando valor manual de respaldo.', err);
+    marketTrm = null;
+    trm = manualTrmFallback;
+    trmSource = 'manual';
+  }
+  renderTRMBadge();
+  renderCart(); // los precios dependen de la TRM
+  if (refreshBtn) refreshBtn.classList.remove('spinning');
+}
+
+function renderTRMBadge() {
+  document.getElementById('trm-text').textContent = 'TRM: ' + formatCOP(trm);
+  const note = document.getElementById('trm-note');
+  if (trmSource === 'live') {
+    note.textContent = `En vivo: ${formatCOP(marketTrm)} + $150`;
+  } else if (trmSource === 'manual') {
+    note.textContent = 'Sin conexión a la TRM en vivo — usando el valor de respaldo';
+  } else {
+    note.textContent = '';
+  }
 }
 
 function initials(name) {
@@ -352,13 +407,14 @@ document.getElementById('search-input').addEventListener('input', (e) => {
 document.getElementById('share-btn').addEventListener('click', () => {
   window.open('https://wa.me/?text=' + encodeURIComponent(shareText()), '_blank');
 });
+document.getElementById('trm-refresh').addEventListener('click', refreshTRM);
 
 async function boot() {
   try {
     await loadData();
-    document.getElementById('trm-badge').textContent = 'TRM: ' + formatCOP(trm);
     renderTabs();
-    renderAll();
+    renderProducts();
+    await refreshTRM(); // trae la TRM en vivo (o cae al respaldo) y refresca el carrito
   } catch (err) {
     document.getElementById('products').innerHTML = `
       <div class="state-msg err">
