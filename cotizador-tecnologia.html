@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CASILLERO | COTIZADOR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --navy:#011F77; --azul:#0659A7; --coral:#EC3E40; --coral-dark:#99282A;
+    --bg:#EBEFF1; --success:#1B8A5A; --success-tint:#E4F1EB; --success-text:#146844;
+    --gray:#5C6470; --gray-tint:#E3E7EA; --border:#DDE2E6; --ink:#141413;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--ink);
+    padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
+  button{font-family:'Poppins',sans-serif;cursor:pointer;}
+  .mono{font-family:'Space Mono',monospace;}
+  a{color:inherit;text-decoration:none;}
+
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+
+  header{background:linear-gradient(135deg,var(--azul),var(--navy));color:#fff;
+    padding:20px 20px 18px;position:sticky;top:0;z-index:10;}
+  header .eyebrow{color:#A9C6EA;font-size:11px;font-weight:700;letter-spacing:1.5px;}
+  header h1{margin:4px 0 0;font-size:22px;font-weight:800;}
+  header .trm{margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);
+    padding:6px 12px;border-radius:9px;font-size:12.5px;font-weight:700;}
+
+  main{flex-grow:1;display:flex;flex-direction:column;padding:16px;gap:16px;}
+
+  .tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;}
+  .tab{flex-shrink:0;padding:9px 16px;border-radius:10px;border:1.5px solid var(--border);
+    background:#fff;font-size:13px;font-weight:700;color:var(--ink);}
+  .tab.active{background:var(--azul);border-color:var(--azul);color:#fff;}
+
+  .search{background:#fff;border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;}
+  .search input{border:none;outline:none;font-family:'Poppins',sans-serif;font-size:14px;width:100%;background:transparent;}
+
+  .products{display:grid;grid-template-columns:1fr;gap:10px;}
+  .card{background:#fff;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;
+    box-shadow:0 1px 2px rgba(1,31,119,.06);}
+  .badge{width:38px;height:38px;border-radius:11px;background:var(--gray-tint);color:var(--navy);
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
+  .card .info{flex-grow:1;min-width:0;}
+  .card .name{font-size:14px;font-weight:700;}
+  .card .variant{font-size:12px;color:var(--gray);margin-top:2px;}
+  .card .price{font-size:12.5px;font-weight:700;color:var(--azul);margin-top:3px;}
+  .add-btn{width:34px;height:34px;border-radius:10px;border:none;background:var(--azul);color:#fff;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .add-btn[disabled]{background:var(--gray-tint);color:var(--gray);}
+
+  #cart-anchor{scroll-margin-top:90px;}
+  .cart-section{background:#fff;border-radius:16px;padding:4px;}
+  .cart-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px;}
+  .cart-head .title{font-size:13px;font-weight:700;}
+  .cart-count{background:var(--azul);color:#fff;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;}
+  .cart-empty{padding:28px 16px;text-align:center;color:var(--gray);font-size:13px;}
+  .cart-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--bg);}
+  .cart-item .info{flex-grow:1;min-width:0;}
+  .cart-item .name{font-size:13.5px;font-weight:700;}
+  .cart-item .variant{font-size:11.5px;color:var(--gray);}
+  .qty{display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:9px;padding:3px 5px;flex-shrink:0;}
+  .qty button{width:24px;height:24px;border:none;background:#fff;border-radius:6px;font-size:15px;font-weight:700;color:var(--azul);}
+  .qty span{width:18px;text-align:center;font-size:12.5px;font-weight:700;}
+  .line-total{width:100px;text-align:right;font-size:13.5px;font-weight:700;flex-shrink:0;}
+  .remove-btn{width:26px;height:26px;border:none;background:transparent;color:var(--coral-dark);flex-shrink:0;}
+
+  .summary{background:linear-gradient(135deg,var(--azul),var(--navy));border-radius:16px;padding:20px;color:#fff;}
+  .summary .label{color:#A9C6EA;font-size:11px;font-weight:700;letter-spacing:.5px;}
+  .summary .total{font-size:30px;font-weight:700;margin:8px 0 2px;}
+  .summary .sub{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#DCE7F5;}
+  .summary .sub .pill{background:rgba(255,255,255,.16);font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:5px;letter-spacing:.5px;}
+
+  .savings{background:var(--success-tint);border-radius:16px;padding:18px;}
+  .savings .row{display:flex;justify-content:space-between;font-size:13px;color:var(--success-text);margin-bottom:10px;}
+  .savings .box{background:#fff;border-radius:10px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;}
+  .savings .box span:first-child{font-size:13px;color:var(--success-text);font-weight:700;}
+  .savings .box span:last-child{font-size:15px;font-weight:700;color:var(--success);}
+
+  .share-btn{width:100%;background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:#fff;border:none;
+    border-radius:12px;padding:14px;font-size:14.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .share-btn svg{flex-shrink:0;}
+
+  .state-msg{padding:40px 16px;text-align:center;color:var(--gray);font-size:14px;}
+  .state-msg.err{color:var(--coral-dark);}
+  .retry{margin-top:10px;background:var(--azul);color:#fff;border:none;border-radius:9px;padding:8px 16px;font-size:13px;font-weight:700;}
+
+  /* ---- Desktop ---- */
+  @media (min-width:960px){
+    header{padding:22px 40px;}
+    header h1{font-size:24px;}
+    main{flex-direction:row;padding:28px 40px;gap:24px;align-items:flex-start;}
+    .browse{flex:1.4;display:flex;flex-direction:column;gap:16px;}
+    .products{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .cart-col{flex:1;position:sticky;top:110px;display:flex;flex-direction:column;gap:16px;}
+    #cart-anchor{position:static;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="eyebrow">EL CASILLERO DE USA</div>
+    <h1>Cotizador</h1>
+    <div class="trm" id="trm-badge">TRM: —</div>
+  </header>
+
+  <main id="main">
+    <div class="browse">
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input id="search-input" type="text" placeholder="Buscar producto...">
+      </div>
+      <div class="tabs" id="tabs"></div>
+      <div class="products" id="products">
+        <div class="state-msg" id="loading-msg">Cargando catálogo...</div>
+      </div>
+    </div>
+
+    <div class="cart-col" id="cart-anchor">
+      <div class="cart-section">
+        <div class="cart-head">
+          <span class="title">Tu cotización</span>
+          <span class="cart-count" id="cart-count">0</span>
+        </div>
+        <div id="cart-list"></div>
+      </div>
+
+      <div class="summary">
+        <div class="label">TOTAL DE LA COTIZACIÓN</div>
+        <div class="total mono" id="total-cop">$0</div>
+        <div class="sub"><span class="pill">COP</span><span id="total-usd">≈ US$0</span></div>
+      </div>
+
+      <div class="savings">
+        <div class="row"><span>vs. referencia Colombia</span><span class="mono" id="ref-cop">$0</span></div>
+        <div class="box"><span>Ahorra el cliente</span><span class="mono" id="savings-pct">—</span></div>
+      </div>
+
+      <button class="share-btn" id="share-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21l1.65-3.8a9 9 0 1 1 3.4 2.9z"></path></svg>
+        Compartir por WhatsApp
+      </button>
+    </div>
+  </main>
+</div>
+
+<script>
+// ==========================================================================
+// CASILLERO | COTIZADOR — Grupo A
+// Conecta a Supabase (proyecto CUADRE CUENTAS, tablas cotizador_*)
+// ==========================================================================
+const SUPABASE_URL = 'https://eqpervrsaozztikplvqq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxcGVydnJzYW96enRpa3BsdnFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4NDA0NzgsImV4cCI6MjEwMDQxNjQ3OH0.FhFQROpEYe9XfdHOKYn5IBBdv-xBArnxY1JGkdIbj_4';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let categories = [];
+let products = [];
+let tiers = [];
+let trm = 0;
+let taxRate = 0;
+
+let activeCategory = null;
+let searchQuery = '';
+let cart = []; // [{ productId, qty }]
+
+function formatCOP(n) {
+  return '$' + Math.round(n).toLocaleString('es-CO').replace(/,/g, '.');
+}
+function formatUSD(n) {
+  return 'US$' + Math.round(n).toLocaleString('en-US');
+}
+
+function commissionFor(usd) {
+  const tier = tiers.find(t => usd >= t.min_usd && (t.max_usd === null || usd < t.max_usd));
+  return tier ? tier.commission_cop : 0;
+}
+
+function calcProduct(p) {
+  const tax = p.price_usd * taxRate;
+  const costUsd = p.price_usd + tax;
+  const costCop = costUsd * trm;
+  const commission = commissionFor(p.price_usd);
+  const saleCop = costCop + commission;
+  return { saleCop };
+}
+
+async function loadData() {
+  const [{ data: cats, error: e1 }, { data: prods, error: e2 },
+         { data: settings, error: e3 }, { data: tierRows, error: e4 }] = await Promise.all([
+    sb.from('cotizador_categories').select('*').order('sort_order'),
+    sb.from('cotizador_products').select('*').eq('active', true),
+    sb.from('cotizador_settings').select('*'),
+    sb.from('cotizador_commission_tiers').select('*').order('sort_order'),
+  ]);
+  if (e1 || e2 || e3 || e4) throw (e1 || e2 || e3 || e4);
+
+  categories = cats;
+  products = prods;
+  tiers = tierRows;
+  trm = settings.find(s => s.key === 'trm').value;
+  taxRate = settings.find(s => s.key === 'tax_rate').value;
+  activeCategory = categories[0] ? categories[0].id : null;
+}
+
+function initials(name) {
+  return name.slice(0, 2).toUpperCase();
+}
+
+function renderTabs() {
+  const el = document.getElementById('tabs');
+  el.innerHTML = categories.map(c => `
+    <button class="tab ${c.id === activeCategory ? 'active' : ''}" data-cat="${c.id}">${c.name}</button>
+  `).join('');
+  el.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => { activeCategory = btn.dataset.cat; renderProducts(); renderTabs(); });
+  });
+}
+
+function renderProducts() {
+  const el = document.getElementById('products');
+  const q = searchQuery.trim().toLowerCase();
+  const list = products.filter(p =>
+    p.category_id === activeCategory &&
+    (q === '' || p.name.toLowerCase().includes(q) || p.variant.toLowerCase().includes(q))
+  );
+  if (list.length === 0) {
+    el.innerHTML = '<div class="state-msg">No hay productos en esta categoría.</div>';
+    return;
+  }
+  el.innerHTML = list.map(p => {
+    const inCart = cart.find(e => e.productId === p.id);
+    return `
+      <div class="card">
+        <div class="badge">${initials(categories.find(c => c.id === p.category_id).name)}</div>
+        <div class="info">
+          <div class="name">${p.name}</div>
+          <div class="variant">${p.variant}</div>
+          <div class="price">${formatUSD(p.price_usd)}</div>
+        </div>
+        <button class="add-btn" data-add="${p.id}" ${inCart ? 'disabled' : ''} aria-label="Agregar ${p.name}">
+          ${inCart
+            ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+            : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>'}
+        </button>
+      </div>`;
+  }).join('');
+  el.querySelectorAll('[data-add]').forEach(btn => {
+    btn.addEventListener('click', () => { addToCart(btn.dataset.add); });
+  });
+}
+
+function addToCart(productId) {
+  if (cart.find(e => e.productId === productId)) return;
+  cart.push({ productId, qty: 1 });
+  renderAll();
+}
+function setQty(productId, qty) {
+  cart = cart.map(e => e.productId === productId ? { ...e, qty: Math.max(1, qty) } : e);
+  renderAll();
+}
+function removeFromCart(productId) {
+  cart = cart.filter(e => e.productId !== productId);
+  renderAll();
+}
+
+function renderCart() {
+  const listEl = document.getElementById('cart-list');
+  document.getElementById('cart-count').textContent = cart.reduce((s, e) => s + e.qty, 0);
+
+  if (cart.length === 0) {
+    listEl.innerHTML = '<div class="cart-empty">Agrega productos desde el catálogo.</div>';
+  } else {
+    listEl.innerHTML = cart.map(entry => {
+      const p = products.find(pr => pr.id === entry.productId);
+      const { saleCop } = calcProduct(p);
+      return `
+        <div class="cart-item">
+          <div class="badge">${initials(categories.find(c => c.id === p.category_id).name)}</div>
+          <div class="info">
+            <div class="name">${p.name}</div>
+            <div class="variant">${p.variant}</div>
+          </div>
+          <div class="qty">
+            <button data-dec="${p.id}" aria-label="Restar">−</button>
+            <span class="mono">${entry.qty}</span>
+            <button data-inc="${p.id}" aria-label="Sumar">+</button>
+          </div>
+          <div class="line-total mono">${formatCOP(saleCop * entry.qty)}</div>
+          <button class="remove-btn" data-remove="${p.id}" aria-label="Quitar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>`;
+    }).join('');
+    listEl.querySelectorAll('[data-inc]').forEach(b => b.addEventListener('click', () => {
+      const e = cart.find(x => x.productId === b.dataset.inc); setQty(b.dataset.inc, e.qty + 1);
+    }));
+    listEl.querySelectorAll('[data-dec]').forEach(b => b.addEventListener('click', () => {
+      const e = cart.find(x => x.productId === b.dataset.dec); setQty(b.dataset.dec, e.qty - 1);
+    }));
+    listEl.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', () => removeFromCart(b.dataset.remove)));
+  }
+
+  let totalSale = 0, totalRef = 0, hasRef = true;
+  cart.forEach(entry => {
+    const p = products.find(pr => pr.id === entry.productId);
+    const { saleCop } = calcProduct(p);
+    totalSale += saleCop * entry.qty;
+    if (p.reference_price_cop == null) hasRef = false;
+    else totalRef += p.reference_price_cop * entry.qty;
+  });
+
+  document.getElementById('total-cop').textContent = formatCOP(totalSale);
+  document.getElementById('total-usd').textContent = '≈ ' + formatUSD(totalSale / trm);
+  document.getElementById('ref-cop').textContent = cart.length && hasRef ? formatCOP(totalRef) : '—';
+
+  const savingsEl = document.getElementById('savings-pct');
+  if (cart.length && hasRef && totalRef > 0) {
+    const savings = totalRef - totalSale;
+    const pct = Math.round((savings / totalRef) * 100);
+    savingsEl.textContent = `${formatCOP(savings)} · ${pct}%`;
+  } else {
+    savingsEl.textContent = '—';
+  }
+}
+
+function renderAll() {
+  renderProducts();
+  renderCart();
+}
+
+function shareText() {
+  if (cart.length === 0) return 'Cotización El Casillero de USA';
+  const lines = cart.map(entry => {
+    const p = products.find(pr => pr.id === entry.productId);
+    const { saleCop } = calcProduct(p);
+    return `• ${p.name} ${p.variant} x${entry.qty} — ${formatCOP(saleCop * entry.qty)}`;
+  });
+  const totalSale = cart.reduce((s, entry) => {
+    const p = products.find(pr => pr.id === entry.productId);
+    return s + calcProduct(p).saleCop * entry.qty;
+  }, 0);
+  return `*Cotización El Casillero de USA*\n\n${lines.join('\n')}\n\n*Total: ${formatCOP(totalSale)} COP*`;
+}
+
+document.getElementById('search-input').addEventListener('input', (e) => {
+  searchQuery = e.target.value; renderProducts();
+});
+document.getElementById('share-btn').addEventListener('click', () => {
+  window.open('https://wa.me/?text=' + encodeURIComponent(shareText()), '_blank');
+});
+
+async function boot() {
+  try {
+    await loadData();
+    document.getElementById('trm-badge').textContent = 'TRM: ' + formatCOP(trm);
+    renderTabs();
+    renderAll();
+  } catch (err) {
+    document.getElementById('products').innerHTML = `
+      <div class="state-msg err">
+        No se pudo cargar el catálogo. Revisa la conexión a Supabase.<br>
+        <button class="retry" id="retry-btn">Reintentar</button>
+      </div>`;
+    document.getElementById('retry-btn').addEventListener('click', boot);
+    console.error(err);
+  }
+}
+boot();
+</script>
+</body>
+</html>
