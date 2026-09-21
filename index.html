@@ -24,7 +24,7 @@
 
   header{background:linear-gradient(135deg,var(--azul),var(--navy));color:#fff;
     padding:18px 20px 18px;position:sticky;top:0;z-index:10;}
-  header .logo{height:22px;display:block;}
+  header .logo{height:34px;display:block;}
   header h1{margin:10px 0 0;font-size:20px;font-weight:800;}
   header .trm{margin-top:10px;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);
     padding:6px 12px;border-radius:9px;font-size:12.5px;font-weight:700;}
@@ -89,6 +89,15 @@
   .detail-row .amt .usd{display:block;font-size:11px;color:var(--gray);margin-top:1px;}
   .detail-row.highlight span:first-child{color:var(--navy);font-weight:700;}
   .detail-row.highlight .amt .cop{color:var(--navy);font-size:14.5px;}
+  .detail-row.discount span:first-child{color:var(--coral-dark);}
+  .detail-row.discount .amt .cop{color:var(--coral-dark);}
+
+  .discount-card{background:#fff;border-radius:16px;padding:16px 18px;}
+  .discount-card label{display:block;font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+  .discount-input-wrap{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:10px;padding:10px 12px;}
+  .discount-input-wrap span{font-size:13px;font-weight:700;color:var(--gray);flex-shrink:0;}
+  .discount-input-wrap input{border:none;outline:none;background:transparent;font-family:'Space Mono',monospace;
+    font-size:14px;font-weight:700;color:var(--ink);width:100%;}
 
   .savings{background:var(--success-tint);border-radius:16px;padding:18px;}
   .savings .row{display:flex;justify-content:space-between;font-size:13px;color:var(--success-text);margin-bottom:10px;}
@@ -108,6 +117,7 @@
   /* ---- Desktop ---- */
   @media (min-width:960px){
     header{padding:22px 40px;}
+    header .logo{height:42px;}
     header h1{font-size:24px;}
     main{flex-direction:row;padding:28px 40px;gap:24px;align-items:flex-start;}
     .browse{flex:1.4;display:flex;flex-direction:column;gap:16px;}
@@ -152,6 +162,15 @@
         <div id="cart-list"></div>
       </div>
 
+      <div class="discount-card">
+        <label for="discount-input">Descuento para el cliente (opcional)</label>
+        <div class="discount-input-wrap">
+          <span>$</span>
+          <input type="number" id="discount-input" min="0" step="1000" placeholder="0">
+          <span>COP</span>
+        </div>
+      </div>
+
       <div class="summary">
         <div class="label">VALOR TOTAL DE LA COTIZACIÓN</div>
         <div class="total mono" id="total-cop">$0</div>
@@ -166,6 +185,10 @@
         <div class="detail-row">
           <span>Costo total</span>
           <span class="amt"><span class="cop mono" id="detail-costo-cop">$0</span><span class="usd mono" id="detail-costo-usd">US$0</span></span>
+        </div>
+        <div class="detail-row discount" id="detail-descuento-row" style="display:none;">
+          <span>Descuento aplicado</span>
+          <span class="amt"><span class="cop mono" id="detail-descuento-cop">−$0</span><span class="usd mono" id="detail-descuento-usd">−US$0</span></span>
         </div>
         <div class="detail-row">
           <span>Ganancia</span>
@@ -216,6 +239,7 @@ let taxRate = 0;
 let activeCategory = null;
 let searchQuery = '';
 let cart = []; // [{ productId, qty }]
+let discount = 0; // descuento manual para el cliente, en COP
 
 function formatCOP(n) {
   return '$' + Math.round(n).toLocaleString('es-CO').replace(/,/g, '.');
@@ -402,23 +426,33 @@ function renderCart() {
     if (p.reference_price_cop == null) hasRef = false;
     else totalRef += p.reference_price_cop * entry.qty;
   });
-  const totalGanancia = totalSale - totalCosto;
+  const appliedDiscount = Math.min(discount, totalSale);
+  const finalTotal = totalSale - appliedDiscount;
+  const totalGanancia = finalTotal - totalCosto;
 
-  document.getElementById('total-cop').textContent = formatCOP(totalSale);
-  document.getElementById('total-usd').textContent = '≈ ' + formatUSD(totalSale / trm);
+  document.getElementById('total-cop').textContent = formatCOP(finalTotal);
+  document.getElementById('total-usd').textContent = '≈ ' + formatUSD(finalTotal / trm);
   document.getElementById('ref-cop').textContent = cart.length && hasRef ? formatCOP(totalRef) : '—';
 
   document.getElementById('detail-trm').textContent = formatCOP(trm);
   document.getElementById('detail-costo-cop').textContent = formatCOP(totalCosto);
   document.getElementById('detail-costo-usd').textContent = formatUSD(totalCosto / trm);
+  const descuentoRow = document.getElementById('detail-descuento-row');
+  if (appliedDiscount > 0) {
+    descuentoRow.style.display = 'flex';
+    document.getElementById('detail-descuento-cop').textContent = '−' + formatCOP(appliedDiscount);
+    document.getElementById('detail-descuento-usd').textContent = '−' + formatUSD(appliedDiscount / trm);
+  } else {
+    descuentoRow.style.display = 'none';
+  }
   document.getElementById('detail-ganancia-cop').textContent = formatCOP(totalGanancia);
   document.getElementById('detail-ganancia-usd').textContent = formatUSD(totalGanancia / trm);
-  document.getElementById('detail-valor-cop').textContent = formatCOP(totalSale);
-  document.getElementById('detail-valor-usd').textContent = formatUSD(totalSale / trm);
+  document.getElementById('detail-valor-cop').textContent = formatCOP(finalTotal);
+  document.getElementById('detail-valor-usd').textContent = formatUSD(finalTotal / trm);
 
   const savingsEl = document.getElementById('savings-pct');
   if (cart.length && hasRef && totalRef > 0) {
-    const savings = totalRef - totalSale;
+    const savings = totalRef - finalTotal;
     const pct = Math.round((savings / totalRef) * 100);
     savingsEl.textContent = `${formatCOP(savings)} · ${pct}%`;
   } else {
@@ -459,11 +493,14 @@ async function buildQuoteCanvas() {
     const p = products.find(pr => pr.id === entry.productId);
     return s + calcProduct(p).saleCop * entry.qty;
   }, 0);
+  const appliedDiscount = Math.min(discount, totalSale);
+  const finalTotal = totalSale - appliedDiscount;
 
   const W = 1080, headerH = 300, itemLineH = 56;
   const itemsH = Math.max(items.length, 1) * itemLineH + 60;
+  const discountH = appliedDiscount > 0 ? 60 : 0;
   const totalH = 340, footerH = 90;
-  const H = headerH + itemsH + totalH + footerH;
+  const H = headerH + itemsH + discountH + totalH + footerH;
 
   const canvas = document.getElementById('quote-canvas');
   canvas.width = W; canvas.height = H;
@@ -488,6 +525,13 @@ async function buildQuoteCanvas() {
   ctx.fillStyle = '#141413'; ctx.font = '600 32px Poppins';
   items.forEach(text => { ctx.fillText(text, W / 2, y); y += itemLineH; });
 
+  if (appliedDiscount > 0) {
+    y += 4;
+    ctx.fillStyle = '#99282A'; ctx.font = '700 30px Poppins';
+    ctx.fillText(`Descuento El Casillero de USA: −${formatCOP(appliedDiscount)}`, W / 2, y);
+    y += discountH - 4;
+  }
+
   y += 14;
   ctx.strokeStyle = '#E3E7EA'; ctx.lineWidth = 2;
   ctx.beginPath(); ctx.moveTo(120, y); ctx.lineTo(W - 120, y); ctx.stroke();
@@ -498,11 +542,11 @@ async function buildQuoteCanvas() {
 
   y += 78;
   ctx.fillStyle = '#011F77'; ctx.font = '700 76px "Space Mono"';
-  ctx.fillText(formatCOP(totalSale) + ' COP', W / 2, y);
+  ctx.fillText(formatCOP(finalTotal) + ' COP', W / 2, y);
 
   y += 56;
   ctx.fillStyle = '#5C6470'; ctx.font = '400 34px "Space Mono"';
-  ctx.fillText('≈ ' + formatUSD(totalSale / trm), W / 2, y);
+  ctx.fillText('≈ ' + formatUSD(finalTotal / trm), W / 2, y);
 
   ctx.fillStyle = '#5C6470'; ctx.font = '400 22px Poppins';
   ctx.fillText('El Casillero de USA · cotización sujeta a variación de TRM', W / 2, H - 40);
@@ -540,6 +584,11 @@ async function shareQuoteImage() {
 
 document.getElementById('search-input').addEventListener('input', (e) => {
   searchQuery = e.target.value; renderProducts();
+});
+document.getElementById('discount-input').addEventListener('input', (e) => {
+  const v = parseFloat(e.target.value);
+  discount = isNaN(v) || v < 0 ? 0 : v;
+  renderCart();
 });
 document.getElementById('share-btn').addEventListener('click', shareQuoteImage);
 document.getElementById('trm-refresh').addEventListener('click', refreshTRM);
