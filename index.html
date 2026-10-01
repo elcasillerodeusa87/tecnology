@@ -118,7 +118,7 @@
   .retry{margin-top:10px;background:var(--azul);color:#fff;border:none;border-radius:9px;padding:8px 16px;font-size:13px;font-weight:700;}
 
   /* ---- Admin ---- */
-  #admin-view{padding:16px;max-width:980px;margin:0 auto;}
+  #admin-view{width:100%;padding:16px;max-width:1140px;margin:0 auto;}
   .admin-back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--azul);
     font-size:13.5px;font-weight:700;padding:8px 0;margin-bottom:8px;}
   .login-card{background:#fff;border-radius:16px;padding:24px 22px;max-width:360px;margin:40px auto;}
@@ -130,8 +130,11 @@
     font-family:'Poppins',sans-serif;font-size:14px;color:var(--ink);background:#fff;}
   .btn-primary{width:100%;background:linear-gradient(135deg,var(--azul),var(--navy));color:#fff;border:none;
     border-radius:10px;padding:12px;font-size:14px;font-weight:700;margin-top:4px;}
-  .btn-secondary{background:var(--bg);color:var(--ink);border:none;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:700;}
-  .btn-danger{background:#FDE6E6;color:var(--coral-dark);border:none;border-radius:8px;padding:7px 10px;font-size:12px;font-weight:700;}
+  .btn-secondary{background:#fff;color:var(--azul);border:1.5px solid var(--azul);border-radius:9px;
+    padding:8px 13px;font-size:13px;font-weight:700;transition:background .15s;}
+  .btn-secondary:hover{background:#EFF5FB;}
+  .btn-secondary.saved{background:var(--success);border-color:var(--success);color:#fff;}
+  .btn-danger{background:#FDE6E6;color:var(--coral-dark);border:1.5px solid transparent;border-radius:8px;padding:7px 10px;font-size:12px;font-weight:700;}
   .form-error{color:var(--coral-dark);font-size:12.5px;margin-top:8px;}
 
   .admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
@@ -143,9 +146,20 @@
   .add-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--bg);}
   .add-grid .btn-primary{margin-top:2px;}
 
-  .prod-row{display:grid;grid-template-columns:1fr;gap:8px;padding:14px 0;border-top:1px solid var(--bg);}
+  .prod-search{background:var(--bg);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  .prod-search input{border:none;outline:none;background:transparent;font-family:'Poppins',sans-serif;font-size:13.5px;width:100%;}
+  .prod-count-hint{font-size:12px;color:var(--gray);margin-bottom:10px;}
+
+  .prod-head{display:none;}
+  .cat-divider{font-size:11px;font-weight:800;color:var(--azul);letter-spacing:.6px;text-transform:uppercase;
+    padding:14px 0 6px;}
+  .cat-divider:first-child{padding-top:0;}
+
+  .prod-row{display:grid;grid-template-columns:1fr;gap:6px;padding:14px 0;border-top:1px solid var(--bg);}
   .prod-row:first-of-type{border-top:none;}
-  .prod-row .row-actions{display:flex;gap:8px;margin-top:4px;}
+  .prod-row .pf-label{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.3px;
+    margin-bottom:-2px;}
+  .prod-row .row-actions{display:flex;gap:8px;margin-top:6px;}
   .prod-row .inactive-tag{font-size:10.5px;font-weight:700;color:var(--coral-dark);background:#FDE6E6;
     padding:2px 8px;border-radius:5px;align-self:flex-start;}
   .checkbox-field{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);}
@@ -166,8 +180,11 @@
     #cart-anchor{position:static;}
     #admin-view{padding:28px 40px;}
     .add-grid{grid-template-columns:repeat(5,1fr) auto;align-items:end;}
+    .prod-head{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr auto auto;gap:8px;
+      padding:0 0 8px;font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;}
     .prod-row{grid-template-columns:1.4fr 1fr 1fr 1fr 1fr auto auto;align-items:center;}
     .prod-row .row-actions{margin-top:0;}
+    .prod-row .pf-label{display:none;}
   }
 </style>
 </head>
@@ -327,6 +344,13 @@
 
       <div class="admin-card">
         <h3>Catálogo (<span id="prod-count">0</span> productos)</h3>
+        <div class="prod-search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input id="admin-prod-search" type="text" placeholder="Buscar por nombre, variante o categoría...">
+        </div>
+        <div class="prod-head">
+          <span>Categoría</span><span>Nombre</span><span>Variante</span><span>USD</span><span>COP</span><span></span><span></span>
+        </div>
         <div id="admin-prod-list"></div>
       </div>
     </div>
@@ -741,6 +765,8 @@ document.getElementById('trm-refresh').addEventListener('click', refreshTRM);
 // Admin / Configuración (Grupo B)
 // ==========================================================================
 let adminTiersState = [];
+let adminProductsAll = [];
+let adminProductSearch = '';
 
 function showAdminView() {
   document.getElementById('app').style.display = 'none';
@@ -802,26 +828,56 @@ async function loadAdminPanel() {
 async function loadAdminProducts() {
   const { data, error } = await sb.from('cotizador_products').select('*').order('category_id').order('name');
   if (error) { console.error(error); return; }
-  renderAdminProducts(data);
+  adminProductsAll = data;
+  applyAdminProductFilter();
+}
+
+function categoryName(id) {
+  const c = categories.find(cat => cat.id === id);
+  return c ? c.name : id;
+}
+
+function applyAdminProductFilter() {
+  const q = adminProductSearch.trim().toLowerCase();
+  const list = q === '' ? adminProductsAll : adminProductsAll.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    p.variant.toLowerCase().includes(q) ||
+    categoryName(p.category_id).toLowerCase().includes(q)
+  );
+  renderAdminProducts(list);
 }
 
 function renderAdminProducts(list) {
-  document.getElementById('prod-count').textContent = list.length;
+  document.getElementById('prod-count').textContent = adminProductsAll.length;
   const el = document.getElementById('admin-prod-list');
-  el.innerHTML = list.map(p => `
-    <div class="prod-row" id="prod-row-${p.id}">
-      <select class="pf-cat"></select>
-      <input class="pf-name" type="text" value="${p.name.replace(/"/g, '&quot;')}">
-      <input class="pf-variant" type="text" value="${p.variant.replace(/"/g, '&quot;')}">
-      <input class="pf-usd" type="number" step="1" value="${p.price_usd}">
-      <input class="pf-cop" type="number" step="1000" value="${p.reference_price_cop ?? 0}">
-      <label class="checkbox-field"><input class="pf-active" type="checkbox" ${p.active ? 'checked' : ''}> Activo</label>
-      <div class="row-actions">
-        <button class="btn-secondary" onclick="saveProduct('${p.id}')">Guardar</button>
-        <button class="btn-danger" onclick="deleteProduct('${p.id}')">Eliminar</button>
-      </div>
-    </div>
-  `).join('');
+
+  if (list.length === 0) {
+    el.innerHTML = '<div class="state-msg">No hay productos que coincidan con la búsqueda.</div>';
+    return;
+  }
+
+  let html = '';
+  let lastCat = null;
+  list.forEach(p => {
+    if (p.category_id !== lastCat) {
+      html += `<div class="cat-divider">${categoryName(p.category_id)}</div>`;
+      lastCat = p.category_id;
+    }
+    html += `
+      <div class="prod-row" id="prod-row-${p.id}">
+        <div><span class="pf-label">Categoría</span><select class="pf-cat"></select></div>
+        <div><span class="pf-label">Nombre</span><input class="pf-name" type="text" value="${p.name.replace(/"/g, '&quot;')}"></div>
+        <div><span class="pf-label">Variante</span><input class="pf-variant" type="text" value="${p.variant.replace(/"/g, '&quot;')}"></div>
+        <div><span class="pf-label">Valor USA (USD)</span><input class="pf-usd" type="number" step="1" value="${p.price_usd}"></div>
+        <div><span class="pf-label">Valor Colombia (COP)</span><input class="pf-cop" type="number" step="1000" value="${p.reference_price_cop ?? 0}"></div>
+        <label class="checkbox-field"><input class="pf-active" type="checkbox" ${p.active ? 'checked' : ''}> Activo</label>
+        <div class="row-actions">
+          <button class="btn-secondary" id="save-btn-${p.id}" onclick="saveProduct('${p.id}')">Guardar</button>
+          <button class="btn-danger" onclick="deleteProduct('${p.id}')">Eliminar</button>
+        </div>
+      </div>`;
+  });
+  el.innerHTML = html;
   list.forEach(p => {
     const row = document.getElementById(`prod-row-${p.id}`);
     populateCategorySelect(row.querySelector('.pf-cat'), p.category_id);
@@ -830,6 +886,7 @@ function renderAdminProducts(list) {
 
 async function saveProduct(id) {
   const row = document.getElementById(`prod-row-${id}`);
+  const btn = document.getElementById(`save-btn-${id}`);
   const payload = {
     category_id: row.querySelector('.pf-cat').value,
     name: row.querySelector('.pf-name').value.trim(),
@@ -839,10 +896,19 @@ async function saveProduct(id) {
     active: row.querySelector('.pf-active').checked,
     updated_at: new Date().toISOString(),
   };
+  btn.disabled = true;
   const { error } = await sb.from('cotizador_products').update(payload).eq('id', id);
-  if (error) { alert('No se pudo guardar: ' + error.message); return; }
-  await loadData();       // refresca el catálogo que usa el cotizador
-  await loadAdminProducts();
+  if (error) { btn.disabled = false; alert('No se pudo guardar: ' + error.message); return; }
+  await loadData(); // refresca el catálogo que usa el cotizador
+  const idx = adminProductsAll.findIndex(p => p.id === id);
+  if (idx !== -1) adminProductsAll[idx] = { ...adminProductsAll[idx], ...payload };
+  btn.textContent = '✓ Guardado';
+  btn.classList.add('saved');
+  setTimeout(() => {
+    btn.textContent = 'Guardar';
+    btn.classList.remove('saved');
+    btn.disabled = false;
+  }, 1400);
 }
 
 async function deleteProduct(id) {
@@ -947,6 +1013,10 @@ async function saveTiers() {
 }
 
 document.getElementById('admin-open').addEventListener('click', showAdminView);
+document.getElementById('admin-prod-search').addEventListener('input', (e) => {
+  adminProductSearch = e.target.value;
+  applyAdminProductFilter();
+});
 document.getElementById('admin-close').addEventListener('click', hideAdminView);
 document.getElementById('admin-login-btn').addEventListener('click', adminLogin);
 document.getElementById('admin-logout').addEventListener('click', adminLogout);
