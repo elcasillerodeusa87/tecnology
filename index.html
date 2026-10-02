@@ -194,8 +194,12 @@
     transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2);}
   .toggle input:checked ~ .knob{left:18px;}
 
-  .prod-card input.pf-image{border:none;border-bottom:1.5px solid var(--border);padding:3px 0;
-    font-size:12px;color:var(--gray);width:100%;background:transparent;margin-bottom:14px;}
+  .photo-upload{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .photo-upload img{width:44px;height:44px;border-radius:10px;object-fit:cover;background:var(--bg2);flex-shrink:0;}
+  .photo-upload-btn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--border);
+    border-radius:9px;padding:7px 12px;font-size:12px;font-weight:600;color:var(--azul);cursor:pointer;background:#fff;}
+  .photo-upload-btn:hover{background:var(--bg2);}
+  .photo-upload-btn.uploading{color:var(--gray);pointer-events:none;}
 
   .prod-card .stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
   .prod-card .stat-label{font-size:9.5px;font-weight:700;color:var(--gray);letter-spacing:.3px;margin-bottom:5px;}
@@ -392,8 +396,15 @@
             <input type="text" id="new-prod-variant" placeholder="256GB · Rojo">
           </div>
           <div class="field" style="margin-bottom:0;">
-            <label>Foto (URL)</label>
-            <input type="text" id="new-prod-image" placeholder="https://...">
+            <label>Foto</label>
+            <div class="photo-upload" id="new-prod-photo-upload">
+              <img id="new-prod-photo-preview" style="display:none;">
+              <label class="photo-upload-btn">
+                <span id="new-prod-photo-label">Subir foto</span>
+                <input type="file" id="new-prod-photo-input" accept="image/*" style="display:none;">
+              </label>
+            </div>
+            <input type="hidden" id="new-prod-image" value="">
           </div>
           <div class="field" style="margin-bottom:0;">
             <label>Valor USA (USD)</label>
@@ -1055,7 +1066,14 @@ function renderAdminProducts(list) {
             <span class="knob"></span>
           </label>
         </div>
-        <input class="pf-image" type="text" value="${(p.image_url || '').replace(/"/g, '&quot;')}" placeholder="URL de la foto">
+        <div class="photo-upload">
+          ${p.image_url ? `<img src="${p.image_url}" id="photo-preview-${p.id}">` : `<img id="photo-preview-${p.id}" style="display:none;">`}
+          <label class="photo-upload-btn">
+            <span id="photo-label-${p.id}">${p.image_url ? 'Cambiar foto' : 'Subir foto'}</span>
+            <input type="file" class="pf-image-input" data-id="${p.id}" accept="image/*" style="display:none;">
+          </label>
+        </div>
+        <input class="pf-image" type="hidden" value="${(p.image_url || '').replace(/"/g, '&quot;')}">
         <div class="stats">
           <div class="stat">
             <div class="stat-label">USD</div>
@@ -1081,6 +1099,42 @@ function renderAdminProducts(list) {
     const row = document.getElementById(`prod-row-${p.id}`);
     populateCategorySelect(row.querySelector('.pf-cat'), p.category_id);
   });
+  el.querySelectorAll('.pf-image-input').forEach(input => {
+    input.addEventListener('change', (e) => handleProductPhotoChange(e, input.dataset.id));
+  });
+}
+
+async function uploadProductImage(file) {
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const path = `products/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await sb.storage.from('cotizador-fotos').upload(path, file, { upsert: false });
+  if (error) throw error;
+  const { data } = sb.storage.from('cotizador-fotos').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+async function handleProductPhotoChange(e, id) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const labelEl = document.getElementById(`photo-label-${id}`);
+  const previewEl = document.getElementById(`photo-preview-${id}`);
+  const btnEl = labelEl.closest('.photo-upload-btn');
+  btnEl.classList.add('uploading');
+  labelEl.textContent = 'Subiendo...';
+  try {
+    const url = await uploadProductImage(file);
+    previewEl.src = url;
+    previewEl.style.display = 'block';
+    const row = document.getElementById(`prod-row-${id}`);
+    row.querySelector('.pf-image').value = url;
+    labelEl.textContent = 'Cambiar foto';
+    btnEl.classList.remove('uploading');
+    await saveProduct(id); // guarda automáticamente al subir la foto
+  } catch (err) {
+    labelEl.textContent = 'Subir foto';
+    btnEl.classList.remove('uploading');
+    alert('No se pudo subir la foto: ' + err.message);
+  }
 }
 
 async function saveProduct(id) {
@@ -1144,6 +1198,9 @@ async function addProduct() {
   });
   if (error) { errEl.textContent = 'No se pudo agregar: ' + error.message; return; }
   ['new-prod-name', 'new-prod-variant', 'new-prod-image', 'new-prod-usd', 'new-prod-cop'].forEach(i => document.getElementById(i).value = '');
+  document.getElementById('new-prod-photo-preview').style.display = 'none';
+  document.getElementById('new-prod-photo-label').textContent = 'Subir foto';
+  document.getElementById('new-prod-photo-input').value = '';
   await loadData();
   await loadAdminProducts();
   renderCategoryHome();
@@ -1224,6 +1281,26 @@ document.getElementById('admin-close').addEventListener('click', hideAdminView);
 document.getElementById('admin-login-btn').addEventListener('click', adminLogin);
 document.getElementById('admin-logout').addEventListener('click', adminLogout);
 document.getElementById('new-prod-add').addEventListener('click', addProduct);
+document.getElementById('new-prod-photo-input').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const labelEl = document.getElementById('new-prod-photo-label');
+  const previewEl = document.getElementById('new-prod-photo-preview');
+  const btnEl = labelEl.closest('.photo-upload-btn');
+  btnEl.classList.add('uploading');
+  labelEl.textContent = 'Subiendo...';
+  try {
+    const url = await uploadProductImage(file);
+    previewEl.src = url;
+    previewEl.style.display = 'block';
+    document.getElementById('new-prod-image').value = url;
+    labelEl.textContent = 'Cambiar foto';
+  } catch (err) {
+    labelEl.textContent = 'Subir foto';
+    alert('No se pudo subir la foto: ' + err.message);
+  }
+  btnEl.classList.remove('uploading');
+});
 document.getElementById('cfg-save-btn').addEventListener('click', saveAdminConfig);
 document.getElementById('tier-add').addEventListener('click', addTierRow);
 document.getElementById('tier-save-btn').addEventListener('click', saveTiers);
