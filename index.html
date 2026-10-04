@@ -232,16 +232,138 @@
     header .logo{height:28px;}
     header h1{font-size:17px;}
     main{flex-direction:row;padding:28px 40px;gap:24px;align-items:flex-start;}
-    .browse{flex:1.4;display:flex;flex-direction:column;gap:16px;}
+    .wizard-wrap{max-width:680px;margin:0 auto;}
     .cat-home{grid-template-columns:repeat(3,1fr);}
-    .products{grid-template-columns:repeat(2,minmax(0,1fr));}
-    .cart-col{flex:1;position:sticky;top:110px;display:flex;flex-direction:column;gap:16px;}
-    #cart-anchor{position:static;}
+    .model-grid{grid-template-columns:repeat(3,1fr);}
     #admin-view{padding:28px 40px;}
     .add-grid{grid-template-columns:repeat(3,1fr);}
     .add-grid .btn-primary{grid-column:1/-1;}
     .prod-grid{grid-template-columns:repeat(3,1fr);}
   }
+
+  /* ================= WIZARD ================= */
+  .wizard-wrap{padding:28px 18px 120px;}
+  .q-title{font-size:22px;font-weight:800;letter-spacing:-.3px;margin-bottom:22px;}
+  .q-search{padding:15px 18px;border-radius:16px;margin-bottom:4px;}
+  .q-search input{font-size:15px;}
+  .q-label{font-size:11px;font-weight:700;color:var(--gray);letter-spacing:.4px;margin:22px 0 10px;}
+
+  .suggest-list{display:none;flex-direction:column;background:#fff;border:1px solid var(--border);
+    border-radius:14px;margin-top:8px;overflow:hidden;}
+  .suggest-list.open{display:flex;}
+  .suggest-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-top:1px solid var(--border);
+    text-align:left;background:none;border-left:none;border-right:none;border-bottom:none;font-family:inherit;}
+  .suggest-row:first-child{border-top:none;}
+  .suggest-row .s-badge{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+    font-size:9px;font-weight:800;flex-shrink:0;}
+  .suggest-row .s-name{font-size:13.5px;font-weight:600;flex-grow:1;}
+  .suggest-row .s-type{font-size:10.5px;color:var(--gray);}
+
+  .cat-home{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+  .cat-card{border:1.5px solid var(--border);border-radius:16px;padding:16px;text-align:left;
+    display:flex;flex-direction:column;gap:8px;align-items:flex-start;}
+  .cat-card-name{font-size:13px;font-weight:700;}
+  .cat-card-count{font-size:11px;color:var(--gray);}
+
+  .recent-list{display:flex;flex-direction:column;}
+  .recent-row{display:flex;align-items:center;gap:12px;padding:10px 2px;border-top:1px solid var(--border);}
+  .recent-row:first-child{border-top:none;}
+  .recent-row .thumb{width:36px;height:36px;border-radius:9px;}
+  .recent-row .r-badge{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    font-size:9px;font-weight:700;text-align:center;line-height:1.2;flex-shrink:0;color:var(--gray);background:var(--bg2);}
+  .recent-row .r-name{flex-grow:1;font-size:13px;font-weight:600;min-width:0;}
+  .recent-row .r-time{font-family:'Space Mono',monospace;font-size:11.5px;color:var(--gray);flex-shrink:0;}
+
+  .breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+  .crumb-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg2);border:none;border-radius:20px;
+    padding:7px 12px 7px 9px;font-size:12px;font-weight:700;color:var(--azul);font-family:inherit;}
+
+  .model-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  .model-card{border:1.5px solid var(--border);border-radius:18px;padding:14px;display:flex;flex-direction:column;
+    gap:8px;align-items:flex-start;text-align:left;background:#fff;}
+  .model-card.selected{border-color:var(--navy);background:#FAFBFD;}
+  .model-card .m-thumb{width:100%;height:84px;border-radius:12px;object-fit:cover;background:var(--bg2);}
+  .model-card .m-badge{width:100%;height:84px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:800;}
+  .model-card .m-name{font-size:13px;font-weight:700;}
+  .model-card .m-price{font-size:11px;color:var(--gray);}
+  .model-card .m-price .mono{font-weight:700;color:var(--ink);}
+
+  .variant-head{display:flex;gap:16px;align-items:center;margin-bottom:26px;}
+  .variant-head img{width:68px;height:68px;border-radius:15px;object-fit:cover;background:var(--bg2);flex-shrink:0;}
+  .variant-head .vh-badge{width:68px;height:68px;border-radius:15px;display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:800;flex-shrink:0;}
+  .variant-head .vh-name{font-size:19px;font-weight:800;}
+
+  .q-block{margin-bottom:26px;padding-top:0;}
+  .q-block + .q-block{padding-top:22px;border-top:1px solid var(--border);}
+  .q-block-title{font-size:13.5px;font-weight:700;margin-bottom:12px;}
+  .size-pills{display:flex;gap:9px;flex-wrap:wrap;}
+  .pill-btn{padding:10px 18px;border-radius:11px;border:1.5px solid var(--border);background:#fff;
+    font-size:13.5px;font-weight:600;color:var(--ink);font-family:inherit;}
+  .pill-btn.active{border-color:var(--navy);background:var(--navy);color:#fff;font-weight:700;}
+  .pill-btn[disabled]{opacity:.35;pointer-events:none;}
+
+  .color-swatches{display:flex;gap:13px;flex-wrap:wrap;}
+  .swatch-btn{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;font-family:inherit;}
+  .swatch-circle{width:32px;height:32px;border-radius:50%;display:block;border:1px solid rgba(0,0,0,.08);}
+  .swatch-btn.active .swatch-circle{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--navy);}
+  .swatch-label{font-size:10.5px;font-weight:600;color:var(--gray);}
+  .swatch-btn.active .swatch-label{color:var(--ink);font-weight:700;}
+  .swatch-btn[disabled]{opacity:.3;pointer-events:none;}
+
+  .sticky-price-bar{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);
+    border-radius:16px;padding:16px 18px;}
+  .sticky-price-bar .vp-label{font-size:11px;font-weight:700;color:var(--gray);}
+  .sticky-price-bar .vp-price{font-family:'Space Mono',monospace;font-size:21px;font-weight:700;margin-top:2px;}
+  .sticky-price-bar button{background:var(--navy);color:#fff;border:none;border-radius:12px;padding:13px 24px;
+    font-size:14px;font-weight:700;font-family:inherit;}
+  .sticky-price-bar button[disabled]{background:var(--gray-tint);color:var(--gray);}
+
+  .result-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  .add-another-btn{background:none;border:none;color:var(--azul);font-size:13px;font-weight:700;font-family:inherit;}
+  .result-list{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
+  .result-item{border:1px solid var(--border);border-radius:18px;padding:14px;display:flex;gap:14px;align-items:center;}
+  .result-item .ri-thumb{width:58px;height:58px;border-radius:12px;object-fit:cover;background:var(--bg2);flex-shrink:0;}
+  .result-item .ri-badge{width:58px;height:58px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:9px;font-weight:700;text-align:center;line-height:1.3;flex-shrink:0;color:var(--gray);background:var(--bg2);}
+  .result-item .ri-info{flex-grow:1;min-width:0;}
+  .result-item .ri-name{font-size:14px;font-weight:700;}
+  .result-item .ri-price{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;margin-top:5px;}
+  .result-item .ri-compare{font-size:11px;color:var(--gray);margin-top:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .result-item .ri-save{font-size:10.5px;font-weight:700;color:var(--success-text);background:var(--success-tint);
+    padding:2px 8px;border-radius:999px;}
+  .result-item .ri-qty{display:flex;align-items:center;gap:7px;flex-shrink:0;}
+  .result-item .ri-qty button{width:22px;height:22px;border-radius:50%;border:1px solid var(--border);background:#fff;
+    color:var(--gray);font-size:13px;display:flex;align-items:center;justify-content:center;}
+  .result-item .ri-remove{color:#C0392B;background:none;border:none;flex-shrink:0;}
+
+  details.detail-card summary{cursor:pointer;font-size:12.5px;font-weight:700;color:var(--azul);list-style:none;}
+  details.detail-card summary::-webkit-details-marker{display:none;}
+  details.detail-card[open] summary{margin-bottom:12px;}
+
+  /* ================= ADMIN: modelos + variantes ================= */
+  .model-admin-card{border:1px solid var(--border);border-radius:18px;padding:18px 20px;margin-bottom:14px;}
+  .model-admin-card .top-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;}
+  .model-admin-card .top-row .fields{display:flex;gap:12px;align-items:center;flex-grow:1;min-width:0;}
+  .model-admin-card .mf-name{border:none;border-bottom:1.5px solid var(--border);padding:4px 0;
+    font-size:15px;font-weight:700;background:transparent;min-width:0;flex-shrink:1;}
+  .model-admin-card .mf-cat{border:1px solid var(--border);border-radius:8px;padding:5px 8px;font-size:11.5px;
+    font-weight:600;background:var(--bg2);flex-shrink:0;}
+  .variant-head-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 44px 32px;gap:8px;padding:0 2px 8px;
+    font-size:9.5px;font-weight:700;color:var(--gray);letter-spacing:.3px;}
+  .variant-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 44px 32px;gap:8px;align-items:center;
+    background:var(--bg2);border-radius:10px;padding:9px 10px;margin-bottom:6px;}
+  .variant-row input{border:none;background:transparent;font-size:12.5px;width:100%;font-family:inherit;}
+  .variant-row input.vr-usd, .variant-row input.vr-cop{font-family:'Space Mono',monospace;}
+  .variant-row .vr-photo{width:28px;height:28px;border-radius:6px;border:1.5px dashed var(--border);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray);overflow:hidden;
+    background:#fff;justify-self:center;}
+  .variant-row .vr-photo-img{width:100%;height:100%;object-fit:cover;}
+  .variant-row .vr-photo-icon{font-size:14px;font-weight:700;}
+  .variant-row .vr-remove{color:#C0392B;background:none;border:none;display:flex;align-items:center;justify-content:center;}
+  .add-variant-btn{margin-top:4px;background:#fff;border:1.5px dashed var(--border);color:var(--azul);
+    border-radius:10px;padding:9px;width:100%;font-size:12.5px;font-weight:700;font-family:inherit;}
 </style>
 </head>
 <body>
@@ -269,78 +391,97 @@
   </header>
 
   <main id="main">
-    <div class="browse">
-      <div class="search">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input id="search-input" type="text" placeholder="Buscar en todo el catálogo...">
-      </div>
-      <div class="cat-home" id="category-home"></div>
-      <button class="back-link" id="back-link" style="display:none;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        Categorías
-      </button>
-      <div class="tabs" id="tabs" style="display:none;"></div>
-      <div class="products" id="products" style="display:none;">
-        <div class="state-msg" id="loading-msg">Cargando catálogo...</div>
-      </div>
-    </div>
+    <div class="wizard-wrap">
 
-    <div class="cart-col" id="cart-anchor">
-      <div class="cart-section">
-        <div class="cart-head">
-          <span class="title">Tu cotización</span>
-          <span class="cart-count" id="cart-count">0</span>
+      <div class="state-msg" id="loading-msg">Cargando catálogo...</div>
+
+      <!-- PASO: inicio -->
+      <div id="step-home" style="display:none;">
+        <div class="q-title">¿Qué vas a cotizar hoy?</div>
+        <div class="search q-search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A8A8E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input id="search-input" type="text" placeholder="iPhone, iPad, Ray-Ban Meta...">
         </div>
-        <div id="cart-list"></div>
-      </div>
-
-      <div class="discount-card">
-        <label for="discount-input">Descuento para el cliente (opcional)</label>
-        <div class="discount-input-wrap">
-          <input type="number" id="discount-input" min="0" max="100" step="0.5" placeholder="0">
-          <span>%</span>
+        <div id="search-suggestions" class="suggest-list"></div>
+        <div id="home-browse">
+          <div class="q-label">O ELIGE UNA CATEGORÍA</div>
+          <div class="cat-home" id="category-home"></div>
+          <div id="recent-wrap">
+            <div class="q-label" style="margin-top:28px;">ÚLTIMAS COTIZADAS</div>
+            <div class="recent-list" id="recent-list"></div>
+          </div>
         </div>
       </div>
 
-      <div class="summary">
-        <div class="label">VALOR TOTAL DE LA COTIZACIÓN</div>
-        <div class="total mono" id="total-cop">$0</div>
-        <div class="sub"><span class="pill">COP</span><span id="total-usd">≈ US$0</span></div>
+      <!-- PASO: modelo -->
+      <div id="step-model" style="display:none;">
+        <div class="breadcrumb" id="model-breadcrumb"></div>
+        <div class="q-title" style="font-size:20px;">Elige el modelo</div>
+        <div class="model-grid" id="model-grid"></div>
       </div>
 
-      <div class="detail-card">
-        <div class="detail-row">
-          <span>TRM utilizada</span>
-          <span class="amt"><span class="cop mono" id="detail-trm">$0</span></span>
-        </div>
-        <div class="detail-row">
-          <span>Costo total</span>
-          <span class="amt"><span class="cop mono" id="detail-costo-cop">$0</span><span class="usd mono" id="detail-costo-usd">US$0</span></span>
-        </div>
-        <div class="detail-row discount" id="detail-descuento-row" style="display:none;">
-          <span id="detail-descuento-label">Descuento aplicado</span>
-          <span class="amt"><span class="cop mono" id="detail-descuento-cop">−$0</span><span class="usd mono" id="detail-descuento-usd">−US$0</span></span>
-        </div>
-        <div class="detail-row">
-          <span>Ganancia</span>
-          <span class="amt"><span class="cop mono" id="detail-ganancia-cop">$0</span><span class="usd mono" id="detail-ganancia-usd">US$0</span></span>
-        </div>
-        <div class="detail-row highlight">
-          <span>Valor total</span>
-          <span class="amt"><span class="cop mono" id="detail-valor-cop">$0</span><span class="usd mono" id="detail-valor-usd">US$0</span></span>
-        </div>
+      <!-- PASO: variante -->
+      <div id="step-variant" style="display:none;">
+        <div class="breadcrumb" id="variant-breadcrumb"></div>
+        <div class="variant-head" id="variant-head"></div>
+        <div id="variant-size-section"></div>
+        <div id="variant-color-section"></div>
+        <div class="sticky-price-bar" id="variant-price-bar"></div>
       </div>
 
-      <div class="savings">
-        <div class="row"><span>vs. referencia Colombia</span><span class="mono" id="ref-cop">$0</span></div>
-        <div class="box"><span>Ahorra el cliente</span><span class="mono" id="savings-pct">—</span></div>
+      <!-- PASO: resultado -->
+      <div id="step-result" style="display:none;">
+        <div class="result-top">
+          <span class="q-title" style="margin:0;font-size:20px;">Tu cotización</span>
+          <button class="add-another-btn" id="add-another-btn">+ Agregar otro producto</button>
+        </div>
+        <div id="cart-list" class="result-list"></div>
+
+        <div class="discount-card">
+          <label for="discount-input">Descuento para el cliente (opcional)</label>
+          <div class="discount-input-wrap">
+            <input type="number" id="discount-input" min="0" max="100" step="0.5" placeholder="0">
+            <span>%</span>
+          </div>
+        </div>
+
+        <div class="summary">
+          <div class="label">VALOR TOTAL DE LA COTIZACIÓN</div>
+          <div class="total mono" id="total-cop">$0</div>
+          <div class="sub"><span class="pill">COP</span><span id="total-usd">≈ US$0</span></div>
+        </div>
+
+        <details class="detail-card">
+          <summary>Ver detalle de costos (uso interno)</summary>
+          <div class="detail-row">
+            <span>TRM utilizada</span>
+            <span class="amt"><span class="cop mono" id="detail-trm">$0</span></span>
+          </div>
+          <div class="detail-row">
+            <span>Costo total</span>
+            <span class="amt"><span class="cop mono" id="detail-costo-cop">$0</span><span class="usd mono" id="detail-costo-usd">US$0</span></span>
+          </div>
+          <div class="detail-row discount" id="detail-descuento-row" style="display:none;">
+            <span id="detail-descuento-label">Descuento aplicado</span>
+            <span class="amt"><span class="cop mono" id="detail-descuento-cop">−$0</span><span class="usd mono" id="detail-descuento-usd">−US$0</span></span>
+          </div>
+          <div class="detail-row">
+            <span>Ganancia</span>
+            <span class="amt"><span class="cop mono" id="detail-ganancia-cop">$0</span><span class="usd mono" id="detail-ganancia-usd">US$0</span></span>
+          </div>
+          <div class="detail-row highlight">
+            <span>Valor total</span>
+            <span class="amt"><span class="cop mono" id="detail-valor-cop">$0</span><span class="usd mono" id="detail-valor-usd">US$0</span></span>
+          </div>
+        </details>
+
+        <button class="share-btn" id="share-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21l1.65-3.8a9 9 0 1 1 3.4 2.9z"></path></svg>
+          Descargar imagen para el cliente
+        </button>
+        <div class="share-note">Incluye el nombre completo de cada ítem, el valor y lo que se ahorra frente a Colombia.</div>
       </div>
 
-      <button class="share-btn" id="share-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21l1.65-3.8a9 9 0 1 1 3.4 2.9z"></path></svg>
-        Generar imagen para el cliente
-      </button>
-      <div class="share-note">Descripción + valor total (COP y USD) — sin el detalle de costos ni ganancia</div>
     </div>
   </main>
 </div>
@@ -381,52 +522,41 @@
 
     <div id="admin-productos">
       <div class="admin-card">
-        <h3>Agregar producto</h3>
-        <div class="add-grid">
+        <h3>Agregar modelo</h3>
+        <div class="add-grid" style="grid-template-columns:1fr 1.6fr;">
           <div class="field" style="margin-bottom:0;">
             <label>Categoría</label>
-            <select id="new-prod-cat"></select>
+            <select id="new-model-cat"></select>
           </div>
           <div class="field" style="margin-bottom:0;">
-            <label>Nombre</label>
-            <input type="text" id="new-prod-name" placeholder="iPhone 18 Pro">
+            <label>Nombre del modelo</label>
+            <input type="text" id="new-model-name" placeholder="iPhone 18 Pro Max">
           </div>
-          <div class="field" style="margin-bottom:0;">
-            <label>Variante</label>
-            <input type="text" id="new-prod-variant" placeholder="256GB · Rojo">
-          </div>
-          <div class="field" style="margin-bottom:0;">
-            <label>Foto</label>
-            <div class="photo-upload" id="new-prod-photo-upload">
-              <img id="new-prod-photo-preview" style="display:none;">
-              <label class="photo-upload-btn">
-                <span id="new-prod-photo-label">Subir foto</span>
-                <input type="file" id="new-prod-photo-input" accept="image/*" style="display:none;">
-              </label>
-            </div>
-            <input type="hidden" id="new-prod-image" value="">
-          </div>
-          <div class="field" style="margin-bottom:0;">
-            <label>Valor USA (USD)</label>
-            <div class="affix-wrap"><span>US$</span><input type="number" id="new-prod-usd" step="1"></div>
-          </div>
-          <div class="field" style="margin-bottom:0;">
-            <label>Valor Colombia (COP)</label>
-            <div class="affix-wrap"><span>$</span><input type="number" id="new-prod-cop" step="1000"></div>
-          </div>
-          <button class="btn-primary" id="new-prod-add">+ Agregar</button>
         </div>
-        <div class="form-error" id="new-prod-error"></div>
+        <div class="field" style="margin-top:12px;margin-bottom:0;">
+          <label>Foto (opcional — se usa si una variante no tiene foto propia)</label>
+          <div class="photo-upload" id="new-model-photo-upload">
+            <img id="new-model-photo-preview" style="display:none;">
+            <label class="photo-upload-btn">
+              <span id="new-model-photo-label">Subir foto</span>
+              <input type="file" id="new-model-photo-input" accept="image/*" style="display:none;">
+            </label>
+          </div>
+          <input type="hidden" id="new-model-image" value="">
+        </div>
+        <button class="btn-primary" id="new-model-add" style="margin-top:14px;">+ Crear modelo</button>
+        <div class="form-error" id="new-model-error"></div>
+        <div style="font-size:12px;color:var(--gray);margin-top:10px;">Después de crearlo, agrégale sus variantes (tamaño, color, precio) desde su tarjeta abajo.</div>
       </div>
 
       <div class="admin-card">
-        <h3>Catálogo (<span id="prod-count">0</span> productos)</h3>
+        <h3>Catálogo (<span id="model-count">0</span> modelos)</h3>
         <div class="prod-search">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5C6470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input id="admin-prod-search" type="text" placeholder="Buscar por nombre, variante o categoría...">
+          <input id="admin-model-search" type="text" placeholder="Buscar por nombre o categoría...">
         </div>
         <div class="cat-filter" id="admin-cat-filter"></div>
-        <div class="prod-grid" id="admin-prod-list"></div>
+        <div id="admin-model-list"></div>
       </div>
     </div>
 
@@ -470,7 +600,9 @@ const TRM_SOURCE_URL = 'https://open.er-api.com/v6/latest/USD';
 const TRM_MARKUP = 150; // pesos por encima del valor de mercado, para el precio de venta
 
 let categories = [];
-let products = [];
+let models = [];
+let variants = [];
+let recentQuotes = [];
 let tiers = [];
 let trm = 0;          // TRM operativa (la que se usa para calcular precios) = mercado + TRM_MARKUP
 let marketTrm = null; // TRM de mercado tal cual la reporta la API, solo para mostrar
@@ -478,10 +610,42 @@ let trmSource = 'loading'; // 'live' | 'manual' | 'loading'
 let manualTrmFallback = 0;
 let taxRate = 0;
 
-let activeCategory = null;
 let searchQuery = '';
-let cart = []; // [{ productId, qty }]
+let cart = []; // [{ variantId, qty }]
 let discountPct = 0; // descuento manual para el cliente, en % sobre el valor total
+
+// ---- estado del wizard ----
+let wizardStep = 'home'; // 'home' | 'model' | 'variant' | 'result'
+let wizardCategoryId = null;
+let wizardModelId = null;
+let wizardSize = null;
+let wizardColor = null;
+
+const COLOR_HEX = {
+  'negro': '#1D1D1F', 'blanco': '#F5F5F5', 'plata': '#C8C9CC', 'plateado': '#C8C9CC',
+  'dorado': '#D4C3A3', 'oro': '#D4C3A3', 'rojo': '#B8352A', 'azul': '#AFC3DB',
+  'verde': '#5C8A6E', 'rosado': '#E8B4C0', 'rosa': '#E8B4C0', 'morado': '#8A6FB0',
+  'púrpura': '#8A6FB0', 'purpura': '#8A6FB0', 'gris': '#9A9AA0', 'titanio': '#D4C3A3',
+  'naranja': '#D98A3D', 'amarillo': '#E0C84A', 'grafito': '#4A4A4D', 'medianoche': '#2B3242',
+  'estelar': '#E8DFC8', 'celeste': '#A9D1E0',
+};
+function colorHex(name) {
+  if (!name) return '#D1D1D6';
+  return COLOR_HEX[name.trim().toLowerCase()] || '#D1D1D6';
+}
+
+function relativeTime(iso) {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const min = Math.floor(diffMs / 60000);
+  if (min < 1) return 'ahora';
+  if (min < 60) return `hace ${min} min`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `hace ${hr} h`;
+  const day = Math.floor(hr / 24);
+  if (day === 1) return 'ayer';
+  if (day < 7) return `hace ${day} días`;
+  return new Date(iso).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+}
 
 function formatCOP(n) {
   return '$' + Math.round(n).toLocaleString('es-CO').replace(/,/g, '.');
@@ -505,21 +669,37 @@ function calcProduct(p) {
 }
 
 async function loadData() {
-  const [{ data: cats, error: e1 }, { data: prods, error: e2 },
-         { data: settings, error: e3 }, { data: tierRows, error: e4 }] = await Promise.all([
+  const [{ data: cats, error: e1 }, { data: modelRows, error: e2 }, { data: variantRows, error: e2b },
+         { data: settings, error: e3 }, { data: tierRows, error: e4 }, { data: logRows, error: e5 }] = await Promise.all([
     sb.from('cotizador_categories').select('*').order('sort_order'),
-    sb.from('cotizador_products').select('*').eq('active', true),
+    sb.from('cotizador_models').select('*').eq('active', true),
+    sb.from('cotizador_variants').select('*').eq('active', true),
     sb.from('cotizador_settings').select('*'),
     sb.from('cotizador_commission_tiers').select('*').order('sort_order'),
+    sb.from('cotizador_quote_log').select('*').order('created_at', { ascending: false }).limit(10),
   ]);
-  if (e1 || e2 || e3 || e4) throw (e1 || e2 || e3 || e4);
+  if (e1 || e2 || e2b || e3 || e4) throw (e1 || e2 || e2b || e3 || e4);
 
   categories = cats;
-  products = prods;
+  models = modelRows;
+  variants = variantRows;
   tiers = tierRows;
+  recentQuotes = logRows || [];
   manualTrmFallback = settings.find(s => s.key === 'trm').value;
   taxRate = settings.find(s => s.key === 'tax_rate').value;
-  activeCategory = null;
+}
+
+function modelVariants(modelId) {
+  return variants.filter(v => v.model_id === modelId);
+}
+function modelById(id) {
+  return models.find(m => m.id === id);
+}
+function variantPriceRange(modelId) {
+  const vs = modelVariants(modelId);
+  if (vs.length === 0) return null;
+  const prices = vs.map(v => v.price_usd);
+  return { min: Math.min(...prices), max: Math.max(...prices), same: Math.min(...prices) === Math.max(...prices) };
 }
 
 async function fetchLiveTRM() {
@@ -581,158 +761,333 @@ function categoryColor(id) {
 function renderCategoryHome() {
   const el = document.getElementById('category-home');
   el.innerHTML = categories.map(c => {
-    const count = products.filter(p => p.category_id === c.id).length;
+    const count = models.filter(m => m.category_id === c.id).length;
     const col = categoryColor(c.id);
     return `
       <button class="cat-card" data-cat="${c.id}" style="border-color:${col.border};background:${col.bg};">
         <div class="badge" style="background:#fff;color:${col.fg};">${initials(c.name)}</div>
         <div class="cat-card-name">${c.name}</div>
-        <div class="cat-card-count">${count} producto${count === 1 ? '' : 's'}</div>
+        <div class="cat-card-count">${count} modelo${count === 1 ? '' : 's'}</div>
       </button>`;
   }).join('');
   el.querySelectorAll('[data-cat]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      activeCategory = btn.dataset.cat;
-      renderTabs();
-      renderProducts();
-    });
+    btn.addEventListener('click', () => goModel(btn.dataset.cat));
   });
 }
 
-function updateBrowseView() {
-  const searching = searchQuery.trim() !== '';
-  const showHome = !searching && !activeCategory;
-  document.getElementById('category-home').style.display = showHome ? 'grid' : 'none';
-  document.getElementById('back-link').style.display = (!searching && activeCategory) ? 'inline-flex' : 'none';
-  document.getElementById('tabs').style.display = (!searching && activeCategory) ? 'flex' : 'none';
-  document.getElementById('products').style.display = showHome ? 'none' : 'grid';
+function renderRecentList() {
+  const wrap = document.getElementById('recent-wrap');
+  const el = document.getElementById('recent-list');
+  if (!recentQuotes || recentQuotes.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  el.innerHTML = recentQuotes.map(q => {
+    const thumb = q.image_url
+      ? `<img class="thumb" src="${q.image_url}" alt="" loading="lazy">`
+      : `<div class="r-badge">SIN<br>FOTO</div>`;
+    const label = q.variant_label ? `${q.model_name} ${q.variant_label}` : q.model_name;
+    return `<div class="recent-row">${thumb}<div class="r-name">${label}</div><div class="r-time">${relativeTime(q.created_at)}</div></div>`;
+  }).join('');
 }
 
-function renderTabs() {
-  const el = document.getElementById('tabs');
-  el.innerHTML = categories.map(c => `
-    <button class="tab ${c.id === activeCategory ? 'active' : ''}" data-cat="${c.id}">${c.name}</button>
-  `).join('');
-  el.querySelectorAll('.tab').forEach(btn => {
-    btn.addEventListener('click', () => { activeCategory = btn.dataset.cat; renderProducts(); renderTabs(); });
-  });
+function clearSearch() {
+  searchQuery = '';
+  const input = document.getElementById('search-input');
+  if (input) input.value = '';
+  const sug = document.getElementById('search-suggestions');
+  sug.classList.remove('open');
+  sug.innerHTML = '';
+  document.getElementById('home-browse').style.display = '';
 }
 
-function renderProducts() {
-  const el = document.getElementById('products');
+function renderSearchSuggestions() {
   const q = searchQuery.trim().toLowerCase();
-  const searching = q !== '';
-  let list;
-  if (searching) {
-    list = products.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      p.variant.toLowerCase().includes(q) ||
-      categoryName(p.category_id).toLowerCase().includes(q)
-    );
-  } else if (activeCategory) {
-    list = products.filter(p => p.category_id === activeCategory);
-  } else {
-    list = [];
-  }
-
-  updateBrowseView();
-
-  if (list.length === 0) {
-    el.innerHTML = searching
-      ? '<div class="state-msg">No hay productos que coincidan con la búsqueda.</div>'
-      : '<div class="state-msg">No hay productos en esta categoría.</div>';
+  const homeBrowse = document.getElementById('home-browse');
+  const sugEl = document.getElementById('search-suggestions');
+  if (q === '') {
+    sugEl.classList.remove('open');
+    sugEl.innerHTML = '';
+    homeBrowse.style.display = '';
     return;
   }
-  el.innerHTML = list.map(p => {
-    const inCart = cart.find(e => e.productId === p.id);
-    const col = categoryColor(p.category_id);
-    const thumb = p.image_url
-      ? `<img class="thumb" src="${p.image_url}" alt="" loading="lazy">`
-      : `<div class="badge" style="background:${col.bg};color:${col.fg};">${initials(categoryName(p.category_id))}</div>`;
-    const catTag = searching ? `<div class="variant">${categoryName(p.category_id)} · ${p.variant}</div>` : `<div class="variant">${p.variant}</div>`;
-    return `
-      <div class="card">
-        ${thumb}
-        <div class="info">
-          <div class="name">${p.name}</div>
-          ${catTag}
-          <div class="price">${formatUSD(p.price_usd)}</div>
-        </div>
-        <button class="add-btn" data-add="${p.id}" ${inCart ? 'disabled' : ''} aria-label="Agregar ${p.name}">
-          ${inCart
-            ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>'
-            : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>'}
-        </button>
-      </div>`;
-  }).join('');
-  el.querySelectorAll('[data-add]').forEach(btn => {
-    btn.addEventListener('click', () => { addToCart(btn.dataset.add); });
+  homeBrowse.style.display = 'none';
+  const matchedCats = categories.filter(c => c.name.toLowerCase().includes(q));
+  const matchedModels = models.filter(m => m.name.toLowerCase().includes(q)).slice(0, 8);
+
+  if (matchedModels.length === 0 && matchedCats.length === 0) {
+    sugEl.innerHTML = '<div class="state-msg">Sin resultados.</div>';
+    sugEl.classList.add('open');
+    return;
+  }
+
+  let html = '';
+  matchedCats.forEach(c => {
+    const col = categoryColor(c.id);
+    html += `
+      <button class="suggest-row" data-gocat="${c.id}">
+        <span class="s-badge" style="background:${col.bg};color:${col.fg};">${initials(c.name)}</span>
+        <span class="s-name">${c.name}</span><span class="s-type">Categoría</span>
+      </button>`;
   });
+  matchedModels.forEach(m => {
+    const col = categoryColor(m.category_id);
+    html += `
+      <button class="suggest-row" data-gomodel="${m.id}">
+        <span class="s-badge" style="background:${col.bg};color:${col.fg};">${initials(categoryName(m.category_id))}</span>
+        <span class="s-name">${m.name}</span><span class="s-type">${categoryName(m.category_id)}</span>
+      </button>`;
+  });
+  sugEl.innerHTML = html;
+  sugEl.classList.add('open');
+  sugEl.querySelectorAll('[data-gocat]').forEach(b => b.addEventListener('click', () => { clearSearch(); goModel(b.dataset.gocat); }));
+  sugEl.querySelectorAll('[data-gomodel]').forEach(b => b.addEventListener('click', () => { clearSearch(); selectModel(b.dataset.gomodel); }));
 }
 
-function addToCart(productId) {
-  if (cart.find(e => e.productId === productId)) return;
-  cart.push({ productId, qty: 1 });
-  renderAll();
+function setStep(step) {
+  wizardStep = step;
+  ['home', 'model', 'variant', 'result'].forEach(s => {
+    document.getElementById('step-' + s).style.display = (s === step) ? 'block' : 'none';
+  });
+  if (step === 'home') { renderCategoryHome(); renderRecentList(); }
+  else if (step === 'model') { renderModelGrid(); }
+  else if (step === 'variant') { renderVariantStep(); }
+  else if (step === 'result') { renderCart(); }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-function setQty(productId, qty) {
-  cart = cart.map(e => e.productId === productId ? { ...e, qty: Math.max(1, qty) } : e);
-  renderAll();
+
+function goHome() {
+  wizardCategoryId = null; wizardModelId = null; wizardSize = null; wizardColor = null;
+  clearSearch();
+  setStep('home');
 }
-function removeFromCart(productId) {
-  cart = cart.filter(e => e.productId !== productId);
-  renderAll();
+function goModel(categoryId) {
+  wizardCategoryId = categoryId; wizardModelId = null; wizardSize = null; wizardColor = null;
+  setStep('model');
+}
+
+function renderModelGrid() {
+  const catName = categoryName(wizardCategoryId);
+  document.getElementById('model-breadcrumb').innerHTML = `
+    <button class="crumb-chip" id="crumb-home">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      ${catName}
+    </button>`;
+  document.getElementById('crumb-home').addEventListener('click', goHome);
+
+  const el = document.getElementById('model-grid');
+  const list = models.filter(m => m.category_id === wizardCategoryId);
+  if (list.length === 0) {
+    el.innerHTML = '<div class="state-msg">No hay modelos en esta categoría todavía.</div>';
+    return;
+  }
+  el.innerHTML = list.map(m => {
+    const range = variantPriceRange(m.id);
+    const col = categoryColor(m.category_id);
+    const thumb = m.image_url
+      ? `<img class="m-thumb" src="${m.image_url}" alt="" loading="lazy">`
+      : `<div class="m-badge" style="background:${col.bg};color:${col.fg};">${initials(m.name)}</div>`;
+    const priceLabel = !range ? 'Sin variantes' : range.same
+      ? `<span class="mono">${formatUSD(range.min)}</span>`
+      : `Desde <span class="mono">${formatUSD(range.min)}</span>`;
+    return `
+      <button class="model-card" data-model="${m.id}">
+        ${thumb}
+        <div class="m-name">${m.name}</div>
+        <div class="m-price">${priceLabel}</div>
+      </button>`;
+  }).join('');
+  el.querySelectorAll('[data-model]').forEach(btn => btn.addEventListener('click', () => selectModel(btn.dataset.model)));
+}
+
+function selectModel(modelId) {
+  const m = modelById(modelId);
+  if (!m) return;
+  wizardCategoryId = m.category_id;
+  wizardModelId = modelId;
+  wizardSize = null; wizardColor = null;
+  const vs = modelVariants(modelId);
+  if (vs.length <= 1) {
+    if (vs.length === 1) addVariantToCart(vs[0].id);
+    setStep('result');
+    return;
+  }
+  setStep('variant');
+}
+
+function renderVariantStep() {
+  const m = modelById(wizardModelId);
+  if (!m) { goHome(); return; }
+  const col = categoryColor(m.category_id);
+
+  document.getElementById('variant-breadcrumb').innerHTML = `
+    <button class="crumb-chip" id="crumb-cat">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      ${categoryName(m.category_id)}
+    </button>
+    <button class="crumb-chip" id="crumb-model">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      ${m.name}
+    </button>`;
+  document.getElementById('crumb-cat').addEventListener('click', () => goModel(m.category_id));
+  document.getElementById('crumb-model').addEventListener('click', () => goModel(m.category_id));
+
+  const thumbHtml = m.image_url
+    ? `<img src="${m.image_url}" alt="">`
+    : `<div class="vh-badge" style="background:${col.bg};color:${col.fg};">${initials(m.name)}</div>`;
+  document.getElementById('variant-head').innerHTML = `${thumbHtml}<div class="vh-name">${m.name}</div>`;
+
+  const vs = modelVariants(m.id);
+  const sizes = [...new Set(vs.map(v => v.size || '').filter(s => s !== ''))];
+  const hasSizeQuestion = sizes.length > 1;
+  if (!hasSizeQuestion) wizardSize = sizes.length === 1 ? sizes[0] : null;
+
+  const sizeSec = document.getElementById('variant-size-section');
+  if (hasSizeQuestion) {
+    sizeSec.innerHTML = `
+      <div class="q-block">
+        <div class="q-block-title">¿Qué tamaño?</div>
+        <div class="size-pills">
+          ${sizes.map(s => `<button class="pill-btn ${wizardSize === s ? 'active' : ''}" data-size="${s.replace(/"/g, '&quot;')}">${s}</button>`).join('')}
+        </div>
+      </div>`;
+    sizeSec.querySelectorAll('[data-size]').forEach(btn => btn.addEventListener('click', () => {
+      wizardSize = btn.dataset.size; wizardColor = null; renderVariantStep();
+    }));
+  } else {
+    sizeSec.innerHTML = '';
+  }
+
+  const colorSec = document.getElementById('variant-color-section');
+  const availableForSize = vs.filter(v => sizes.length === 0 || (v.size || '') === wizardSize);
+  const colors = [...new Set(availableForSize.map(v => v.color || '').filter(c => c !== ''))];
+  const hasColorQuestion = colors.length > 1;
+  if (!hasColorQuestion) wizardColor = colors.length === 1 ? colors[0] : null;
+
+  if (hasColorQuestion && (!hasSizeQuestion || wizardSize)) {
+    colorSec.innerHTML = `
+      <div class="q-block">
+        <div class="q-block-title">¿Qué color?</div>
+        <div class="color-swatches">
+          ${colors.map(c => `
+            <button class="swatch-btn ${wizardColor === c ? 'active' : ''}" data-color="${c.replace(/"/g, '&quot;')}">
+              <span class="swatch-circle" style="background:${colorHex(c)};"></span>
+              <span class="swatch-label">${c}</span>
+            </button>`).join('')}
+        </div>
+      </div>`;
+    colorSec.querySelectorAll('[data-color]').forEach(btn => btn.addEventListener('click', () => {
+      wizardColor = btn.dataset.color; renderVariantStep();
+    }));
+  } else {
+    colorSec.innerHTML = '';
+  }
+
+  const resolved = vs.find(v =>
+    (sizes.length === 0 || (v.size || '') === wizardSize) &&
+    (colors.length === 0 || (v.color || '') === wizardColor)
+  );
+  const bar = document.getElementById('variant-price-bar');
+  if (resolved) {
+    const label = [wizardSize, wizardColor].filter(Boolean).join(' · ') || m.name;
+    bar.innerHTML = `
+      <div><div class="vp-label">${label}</div><div class="vp-price mono">${formatUSD(resolved.price_usd)}</div></div>
+      <button id="variant-add-btn">Agregar</button>`;
+    document.getElementById('variant-add-btn').addEventListener('click', () => {
+      addVariantToCart(resolved.id);
+      setStep('result');
+    });
+  } else {
+    bar.innerHTML = `
+      <div><div class="vp-label">Elige las opciones</div></div>
+      <button disabled>Agregar</button>`;
+  }
+}
+
+function addVariantToCart(variantId) {
+  const existing = cart.find(e => e.variantId === variantId);
+  if (existing) existing.qty += 1;
+  else cart.push({ variantId, qty: 1 });
+  logQuote(variantId);
+}
+
+async function logQuote(variantId) {
+  const v = variants.find(x => x.id === variantId);
+  const m = modelById(v.model_id);
+  if (!v || !m) return;
+  const label = [v.size, v.color].filter(Boolean).join(' · ') || null;
+  const image_url = v.image_url || m.image_url || null;
+  recentQuotes.unshift({ model_name: m.name, variant_label: label, image_url, price_usd: v.price_usd, created_at: new Date().toISOString() });
+  recentQuotes = recentQuotes.slice(0, 10);
+  try {
+    await sb.from('cotizador_quote_log').insert({ model_name: m.name, variant_label: label, image_url, price_usd: v.price_usd });
+  } catch (err) { console.error('No se pudo registrar en el historial de cotizaciones.', err); }
+}
+
+function setQty(variantId, qty) {
+  cart = cart.map(e => e.variantId === variantId ? { ...e, qty: Math.max(1, qty) } : e);
+  renderCart();
+}
+function removeFromCart(variantId) {
+  cart = cart.filter(e => e.variantId !== variantId);
+  renderCart();
 }
 
 function renderCart() {
   const listEl = document.getElementById('cart-list');
-  document.getElementById('cart-count').textContent = cart.reduce((s, e) => s + e.qty, 0);
-
   if (cart.length === 0) {
-    listEl.innerHTML = '<div class="cart-empty">Agrega productos desde el catálogo.</div>';
+    listEl.innerHTML = '<div class="state-msg">Agrega productos desde el catálogo.</div>';
   } else {
     listEl.innerHTML = cart.map(entry => {
-      const p = products.find(pr => pr.id === entry.productId);
-      const { saleCop } = calcProduct(p);
-      const col = categoryColor(p.category_id);
-      const thumb = p.image_url
-        ? `<img class="thumb" src="${p.image_url}" alt="" loading="lazy">`
-        : `<div class="badge" style="background:${col.bg};color:${col.fg};">${initials(categoryName(p.category_id))}</div>`;
+      const v = variants.find(x => x.id === entry.variantId);
+      const m = modelById(v.model_id);
+      const { saleCop } = calcProduct(v);
+      const label = [v.size, v.color].filter(Boolean).join(' · ');
+      const fullName = label ? `${m.name} ${label}` : m.name;
+      const imgUrl = v.image_url || m.image_url;
+      const thumb = imgUrl
+        ? `<img class="ri-thumb" src="${imgUrl}" alt="" loading="lazy">`
+        : `<div class="ri-badge">SIN<br>FOTO</div>`;
+      let compareHtml;
+      if (v.reference_price_cop && v.reference_price_cop > 0) {
+        const savings = v.reference_price_cop - saleCop;
+        const pct = Math.round((savings / v.reference_price_cop) * 100);
+        compareHtml = `Colombia: ${formatCOP(v.reference_price_cop)}` +
+          (savings > 0 ? ` <span class="ri-save">Ahorras ${pct}% · ${formatCOP(savings)}</span>` : '');
+      } else {
+        compareHtml = 'Sin precio de referencia en Colombia';
+      }
       return `
-        <div class="cart-item">
+        <div class="result-item">
           ${thumb}
-          <div class="info">
-            <div class="name">${p.name}</div>
-            <div class="variant">${p.variant}</div>
+          <div class="ri-info">
+            <div class="ri-name">${fullName}</div>
+            <div class="ri-price mono">${formatCOP(saleCop * entry.qty)}</div>
+            <div class="ri-compare">${compareHtml}</div>
           </div>
-          <div class="qty">
-            <button data-dec="${p.id}" aria-label="Restar">−</button>
+          <div class="ri-qty">
+            <button data-dec="${v.id}" aria-label="Restar">−</button>
             <span class="mono">${entry.qty}</span>
-            <button data-inc="${p.id}" aria-label="Sumar">+</button>
+            <button data-inc="${v.id}" aria-label="Sumar">+</button>
           </div>
-          <div class="line-total mono">${formatCOP(saleCop * entry.qty)}</div>
-          <button class="remove-btn" data-remove="${p.id}" aria-label="Quitar">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <button class="ri-remove" data-remove="${v.id}" aria-label="Quitar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
           </button>
         </div>`;
     }).join('');
     listEl.querySelectorAll('[data-inc]').forEach(b => b.addEventListener('click', () => {
-      const e = cart.find(x => x.productId === b.dataset.inc); setQty(b.dataset.inc, e.qty + 1);
+      const e = cart.find(x => x.variantId === b.dataset.inc); setQty(b.dataset.inc, e.qty + 1);
     }));
     listEl.querySelectorAll('[data-dec]').forEach(b => b.addEventListener('click', () => {
-      const e = cart.find(x => x.productId === b.dataset.dec); setQty(b.dataset.dec, e.qty - 1);
+      const e = cart.find(x => x.variantId === b.dataset.dec); setQty(b.dataset.dec, e.qty - 1);
     }));
     listEl.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', () => removeFromCart(b.dataset.remove)));
   }
 
-  let totalSale = 0, totalCosto = 0, totalRef = 0, hasRef = true;
+  let totalSale = 0, totalCosto = 0;
   cart.forEach(entry => {
-    const p = products.find(pr => pr.id === entry.productId);
-    const { saleCop, costCop } = calcProduct(p);
+    const v = variants.find(x => x.id === entry.variantId);
+    const { saleCop, costCop } = calcProduct(v);
     totalSale += saleCop * entry.qty;
     totalCosto += costCop * entry.qty;
-    if (p.reference_price_cop == null) hasRef = false;
-    else totalRef += p.reference_price_cop * entry.qty;
   });
   const appliedDiscount = totalSale * (discountPct / 100);
   const finalTotal = totalSale - appliedDiscount;
@@ -740,7 +1095,6 @@ function renderCart() {
 
   document.getElementById('total-cop').textContent = formatCOP(finalTotal);
   document.getElementById('total-usd').textContent = '≈ ' + formatUSD(finalTotal / trm);
-  document.getElementById('ref-cop').textContent = cart.length && hasRef ? formatCOP(totalRef) : '—';
 
   document.getElementById('detail-trm').textContent = formatCOP(trm);
   document.getElementById('detail-costo-cop').textContent = formatCOP(totalCosto);
@@ -758,19 +1112,9 @@ function renderCart() {
   document.getElementById('detail-ganancia-usd').textContent = formatUSD(totalGanancia / trm);
   document.getElementById('detail-valor-cop').textContent = formatCOP(finalTotal);
   document.getElementById('detail-valor-usd').textContent = formatUSD(finalTotal / trm);
-
-  const savingsEl = document.getElementById('savings-pct');
-  if (cart.length && hasRef && totalRef > 0) {
-    const savings = totalRef - finalTotal;
-    const pct = Math.round((savings / totalRef) * 100);
-    savingsEl.textContent = `${formatCOP(savings)} · ${pct}%`;
-  } else {
-    savingsEl.textContent = '—';
-  }
 }
 
 function renderAll() {
-  renderProducts();
   renderCart();
 }
 
@@ -796,17 +1140,31 @@ async function buildQuoteCanvas() {
   ]);
 
   const items = cart.map(entry => {
-    const p = products.find(pr => pr.id === entry.productId);
-    return { p, label: `${p.name} ${p.variant}` + (entry.qty > 1 ? ` ×${entry.qty}` : '') };
+    const v = variants.find(x => x.id === entry.variantId);
+    const m = modelById(v.model_id);
+    const variantLabel = [v.size, v.color].filter(Boolean).join(' · ');
+    const label = (variantLabel ? `${m.name} ${variantLabel}` : m.name) + (entry.qty > 1 ? ` ×${entry.qty}` : '');
+    const { saleCop } = calcProduct(v);
+    const lineTotal = saleCop * entry.qty;
+    let savingsLine = null;
+    if (v.reference_price_cop && v.reference_price_cop > 0) {
+      const refTotal = v.reference_price_cop * entry.qty;
+      const savings = refTotal - lineTotal;
+      if (savings > 0) {
+        const pct = Math.round((savings / refTotal) * 100);
+        savingsLine = `Ahorras ${pct}% · ${formatCOP(savings)} vs. Colombia`;
+      }
+    }
+    return { label, price: formatCOP(lineTotal), savingsLine, image_url: v.image_url || m.image_url };
   });
   const totalSale = cart.reduce((s, entry) => {
-    const p = products.find(pr => pr.id === entry.productId);
-    return s + calcProduct(p).saleCop * entry.qty;
+    const v = variants.find(x => x.id === entry.variantId);
+    return s + calcProduct(v).saleCop * entry.qty;
   }, 0);
   const appliedDiscount = totalSale * (discountPct / 100);
   const finalTotal = totalSale - appliedDiscount;
 
-  const W = 1080, headerH = 300, itemLineH = 78;
+  const W = 1080, headerH = 300, itemLineH = 118;
   const itemsH = Math.max(items.length, 1) * itemLineH + 50;
   const discountH = appliedDiscount > 0 ? 60 : 0;
   const totalH = 340, footerH = 90;
@@ -832,29 +1190,36 @@ async function buildQuoteCanvas() {
   ctx.fillText('COTIZACIÓN', W / 2, y);
 
   y += 50;
-  const thumbSize = 60, rowLeft = 160;
+  const thumbSize = 68, rowLeft = 150;
   for (const item of items) {
     let hasImg = false;
-    if (item.p.image_url) {
+    if (item.image_url) {
       try {
-        const img = await loadImage(item.p.image_url, true);
+        const img = await loadImage(item.image_url, true);
         ctx.save();
         ctx.beginPath();
-        const r = 12;
-        ctx.moveTo(rowLeft + r, y - thumbSize + 12);
-        ctx.arcTo(rowLeft + thumbSize, y - thumbSize + 12, rowLeft + thumbSize, y + 12, r);
-        ctx.arcTo(rowLeft + thumbSize, y + 12, rowLeft, y + 12, r);
-        ctx.arcTo(rowLeft, y + 12, rowLeft, y - thumbSize + 12, r);
-        ctx.arcTo(rowLeft, y - thumbSize + 12, rowLeft + thumbSize, y - thumbSize + 12, r);
+        const r = 14, imgTop = y - 40;
+        ctx.moveTo(rowLeft + r, imgTop);
+        ctx.arcTo(rowLeft + thumbSize, imgTop, rowLeft + thumbSize, imgTop + thumbSize, r);
+        ctx.arcTo(rowLeft + thumbSize, imgTop + thumbSize, rowLeft, imgTop + thumbSize, r);
+        ctx.arcTo(rowLeft, imgTop + thumbSize, rowLeft, imgTop, r);
+        ctx.arcTo(rowLeft, imgTop, rowLeft + thumbSize, imgTop, r);
         ctx.clip();
-        ctx.drawImage(img, rowLeft, y - thumbSize + 12, thumbSize, thumbSize);
+        ctx.drawImage(img, rowLeft, imgTop, thumbSize, thumbSize);
         ctx.restore();
         hasImg = true;
       } catch (e) { /* imagen no disponible, seguimos sin ella */ }
     }
+    const textX = hasImg ? rowLeft + thumbSize + 24 : rowLeft;
     ctx.textAlign = 'left';
     ctx.fillStyle = '#141413'; ctx.font = '600 30px Inter';
-    ctx.fillText(item.label, hasImg ? rowLeft + thumbSize + 22 : rowLeft, y);
+    ctx.fillText(item.label, textX, y);
+    ctx.fillStyle = '#011F77'; ctx.font = '700 28px "Space Mono"';
+    ctx.fillText(item.price, textX, y + 40);
+    if (item.savingsLine) {
+      ctx.fillStyle = '#1C7A4D'; ctx.font = '600 22px Inter';
+      ctx.fillText(item.savingsLine, textX, y + 72);
+    }
     ctx.textAlign = 'center';
     y += itemLineH;
   }
@@ -917,7 +1282,7 @@ async function shareQuoteImage() {
 }
 
 document.getElementById('search-input').addEventListener('input', (e) => {
-  searchQuery = e.target.value; renderProducts();
+  searchQuery = e.target.value; renderSearchSuggestions();
 });
 document.getElementById('discount-input').addEventListener('input', (e) => {
   const v = parseFloat(e.target.value);
@@ -931,8 +1296,8 @@ document.getElementById('trm-refresh').addEventListener('click', refreshTRM);
 // Admin / Configuración (Grupo B)
 // ==========================================================================
 let adminTiersState = [];
-let adminProductsAll = [];
-let adminProductSearch = '';
+let adminModelsAll = [];
+let adminModelSearch = '';
 let adminCategoryFilter = '';
 
 function showAdminView() {
@@ -988,16 +1353,19 @@ function switchAdminTab(tab) {
 }
 
 async function loadAdminPanel() {
-  populateCategorySelect(document.getElementById('new-prod-cat'));
+  populateCategorySelect(document.getElementById('new-model-cat'));
   renderAdminCatFilter();
   await Promise.all([loadAdminProducts(), loadAdminConfig(), loadAdminTiers()]);
 }
 
 async function loadAdminProducts() {
-  const { data, error } = await sb.from('cotizador_products').select('*').order('category_id').order('name');
-  if (error) { console.error(error); return; }
-  adminProductsAll = data;
-  applyAdminProductFilter();
+  const [{ data: modelRows, error: e1 }, { data: variantRows, error: e2 }] = await Promise.all([
+    sb.from('cotizador_models').select('*').order('category_id').order('name'),
+    sb.from('cotizador_variants').select('*').order('sort_order'),
+  ]);
+  if (e1 || e2) { console.error(e1 || e2); return; }
+  adminModelsAll = modelRows.map(m => ({ ...m, variants: variantRows.filter(v => v.model_id === m.id) }));
+  applyAdminModelFilter();
 }
 
 function categoryName(id) {
@@ -1015,92 +1383,164 @@ function renderAdminCatFilter() {
     btn.addEventListener('click', () => {
       adminCategoryFilter = btn.dataset.cat;
       renderAdminCatFilter();
-      applyAdminProductFilter();
+      applyAdminModelFilter();
     });
   });
 }
 
-function applyAdminProductFilter() {
-  const q = adminProductSearch.trim().toLowerCase();
+function applyAdminModelFilter() {
+  const q = adminModelSearch.trim().toLowerCase();
   let list = adminCategoryFilter === ''
-    ? adminProductsAll
-    : adminProductsAll.filter(p => p.category_id === adminCategoryFilter);
+    ? adminModelsAll
+    : adminModelsAll.filter(m => m.category_id === adminCategoryFilter);
   if (q !== '') {
-    list = list.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      p.variant.toLowerCase().includes(q) ||
-      categoryName(p.category_id).toLowerCase().includes(q)
+    list = list.filter(m =>
+      m.name.toLowerCase().includes(q) ||
+      categoryName(m.category_id).toLowerCase().includes(q)
     );
   }
-  renderAdminProducts(list);
+  renderAdminModels(list);
 }
 
-function renderAdminProducts(list) {
-  document.getElementById('prod-count').textContent = adminProductsAll.length;
-  const el = document.getElementById('admin-prod-list');
+function variantRowHtml(modelId, v) {
+  const rowId = v.id || v._temp;
+  return `
+    <div class="variant-row" data-row-id="${rowId}" data-model="${modelId}" data-variant-id="${v.id || ''}" data-image-url="${(v.image_url || '').replace(/"/g, '&quot;')}">
+      <input class="vr-size" value="${(v.size || '').replace(/"/g, '&quot;')}" placeholder="256GB">
+      <input class="vr-color" value="${(v.color || '').replace(/"/g, '&quot;')}" placeholder="Rojo">
+      <input class="vr-usd" type="number" step="1" value="${v.price_usd || 0}">
+      <input class="vr-cop" type="number" step="1000" value="${v.reference_price_cop || 0}">
+      <label class="vr-photo">
+        <img class="vr-photo-img" src="${v.image_url || ''}" style="${v.image_url ? '' : 'display:none;'}">
+        <span class="vr-photo-icon" style="${v.image_url ? 'display:none;' : ''}">+</span>
+        <input type="file" class="vr-photo-input" accept="image/*" style="display:none;">
+      </label>
+      <button class="vr-remove" data-removerow="${rowId}" aria-label="Quitar variante">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>`;
+}
+
+function wireVariantRow(row) {
+  row.querySelector('.vr-photo-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const url = await uploadProductImage(file);
+      row.dataset.imageUrl = url;
+      const img = row.querySelector('.vr-photo-img');
+      const icon = row.querySelector('.vr-photo-icon');
+      img.src = url; img.style.display = '';
+      icon.style.display = 'none';
+    } catch (err) {
+      alert('No se pudo subir la foto: ' + err.message);
+    }
+  });
+  row.querySelector('.vr-remove').addEventListener('click', async () => {
+    const variantId = row.dataset.variantId;
+    if (variantId) {
+      if (!confirm('¿Eliminar esta variante? Esta acción no se puede deshacer.')) return;
+      const { error } = await sb.from('cotizador_variants').delete().eq('id', variantId);
+      if (error) { alert('No se pudo eliminar: ' + error.message); return; }
+      await loadData();
+      renderCategoryHome();
+    }
+    row.remove();
+  });
+}
+
+function addVariantRow(modelId) {
+  const model = adminModelsAll.find(m => m.id === modelId);
+  const tempId = 'new-' + Math.random().toString(36).slice(2, 9);
+  const blank = { id: null, _temp: tempId, size: '', color: '', price_usd: 0, reference_price_cop: 0, image_url: null };
+  model.variants.push(blank);
+  const container = document.getElementById(`variant-rows-${modelId}`);
+  container.insertAdjacentHTML('beforeend', variantRowHtml(modelId, blank));
+  wireVariantRow(container.lastElementChild);
+}
+
+function renderAdminModels(list) {
+  document.getElementById('model-count').textContent = adminModelsAll.length;
+  const el = document.getElementById('admin-model-list');
 
   if (list.length === 0) {
-    el.innerHTML = '<div class="state-msg">No hay productos que coincidan con la búsqueda.</div>';
+    el.innerHTML = '<div class="state-msg">No hay modelos que coincidan con la búsqueda.</div>';
     return;
   }
 
   let html = '';
   let lastCat = null;
-  list.forEach(p => {
-    if (p.category_id !== lastCat) {
-      html += `<div class="cat-divider">${categoryName(p.category_id)}</div>`;
-      lastCat = p.category_id;
+  list.forEach(m => {
+    if (m.category_id !== lastCat) {
+      html += `<div class="cat-divider">${categoryName(m.category_id)}</div>`;
+      lastCat = m.category_id;
     }
     html += `
-      <div class="prod-card" id="prod-row-${p.id}">
+      <div class="model-admin-card" id="model-card-${m.id}">
         <div class="top-row">
-          ${p.image_url ? `<img class="thumb" src="${p.image_url}" alt="" loading="lazy">` : `<div class="badge" style="background:${categoryColor(p.category_id).bg};color:${categoryColor(p.category_id).fg};">${initials(categoryName(p.category_id))}</div>`}
           <div class="fields">
-            <select class="pf-cat"></select>
-            <input class="pf-name" type="text" value="${p.name.replace(/"/g, '&quot;')}">
-            <input class="pf-variant" type="text" value="${p.variant.replace(/"/g, '&quot;')}" placeholder="256GB · Rojo">
+            <select class="mf-cat"></select>
+            <input class="mf-name" type="text" value="${m.name.replace(/"/g, '&quot;')}">
           </div>
           <label class="toggle" aria-label="Activo">
-            <input class="pf-active" type="checkbox" ${p.active ? 'checked' : ''}>
-            <span class="track"></span>
-            <span class="knob"></span>
+            <input class="mf-active" type="checkbox" ${m.active ? 'checked' : ''}>
+            <span class="track"></span><span class="knob"></span>
           </label>
         </div>
         <div class="photo-upload">
-          ${p.image_url ? `<img src="${p.image_url}" id="photo-preview-${p.id}">` : `<img id="photo-preview-${p.id}" style="display:none;">`}
+          <img id="model-photo-preview-${m.id}" src="${m.image_url || ''}" style="${m.image_url ? '' : 'display:none;'}">
           <label class="photo-upload-btn">
-            <span id="photo-label-${p.id}">${p.image_url ? 'Cambiar foto' : 'Subir foto'}</span>
-            <input type="file" class="pf-image-input" data-id="${p.id}" accept="image/*" style="display:none;">
+            <span id="model-photo-label-${m.id}">${m.image_url ? 'Cambiar foto' : 'Subir foto (opcional)'}</span>
+            <input type="file" class="mf-image-input" accept="image/*" style="display:none;">
           </label>
         </div>
-        <input class="pf-image" type="hidden" value="${(p.image_url || '').replace(/"/g, '&quot;')}">
-        <div class="stats">
-          <div class="stat">
-            <div class="stat-label">USD</div>
-            <input class="pf-usd" type="number" step="1" value="${p.price_usd}">
-          </div>
-          <div class="stat">
-            <div class="stat-label">COP</div>
-            <input class="pf-cop" type="number" step="1000" value="${p.reference_price_cop ?? 0}">
-          </div>
+        <input class="mf-image" type="hidden" value="${(m.image_url || '').replace(/"/g, '&quot;')}">
+
+        <div class="variant-head-row"><span>TAMAÑO</span><span>COLOR</span><span>USD</span><span>COP</span><span>FOTO</span><span></span></div>
+        <div class="variant-rows" id="variant-rows-${m.id}">
+          ${m.variants.map(v => variantRowHtml(m.id, v)).join('')}
         </div>
-        <div class="actions">
-          <button class="icon-btn" id="save-btn-${p.id}" onclick="saveProduct('${p.id}')" aria-label="Guardar">
+        <button class="add-variant-btn" data-addvariant="${m.id}">+ Agregar variante</button>
+
+        <div class="actions" style="margin-top:14px;">
+          <button class="icon-btn" id="save-model-btn-${m.id}" data-savemodel="${m.id}" aria-label="Guardar">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
           </button>
-          <button class="icon-btn danger" onclick="deleteProduct('${p.id}')" aria-label="Eliminar">
+          <button class="icon-btn danger" data-delmodel="${m.id}" aria-label="Eliminar modelo">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
           </button>
         </div>
       </div>`;
   });
   el.innerHTML = html;
-  list.forEach(p => {
-    const row = document.getElementById(`prod-row-${p.id}`);
-    populateCategorySelect(row.querySelector('.pf-cat'), p.category_id);
-  });
-  el.querySelectorAll('.pf-image-input').forEach(input => {
-    input.addEventListener('change', (e) => handleProductPhotoChange(e, input.dataset.id));
+
+  list.forEach(m => {
+    const card = document.getElementById(`model-card-${m.id}`);
+    populateCategorySelect(card.querySelector('.mf-cat'), m.category_id);
+    card.querySelectorAll('.variant-row').forEach(row => wireVariantRow(row));
+
+    card.querySelector('.mf-image-input').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const labelEl = document.getElementById(`model-photo-label-${m.id}`);
+      const previewEl = document.getElementById(`model-photo-preview-${m.id}`);
+      const btnEl = labelEl.closest('.photo-upload-btn');
+      btnEl.classList.add('uploading');
+      labelEl.textContent = 'Subiendo...';
+      try {
+        const url = await uploadProductImage(file);
+        previewEl.src = url; previewEl.style.display = 'block';
+        card.querySelector('.mf-image').value = url;
+        labelEl.textContent = 'Cambiar foto';
+      } catch (err) {
+        alert('No se pudo subir la foto: ' + err.message);
+      }
+      btnEl.classList.remove('uploading');
+    });
+
+    card.querySelector('[data-savemodel]').addEventListener('click', () => saveModel(m.id));
+    card.querySelector('[data-delmodel]').addEventListener('click', () => deleteModel(m.id));
+    card.querySelector('[data-addvariant]').addEventListener('click', () => addVariantRow(m.id));
   });
 }
 
@@ -1113,61 +1553,57 @@ async function uploadProductImage(file) {
   return data.publicUrl;
 }
 
-async function handleProductPhotoChange(e, id) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const labelEl = document.getElementById(`photo-label-${id}`);
-  const previewEl = document.getElementById(`photo-preview-${id}`);
-  const btnEl = labelEl.closest('.photo-upload-btn');
-  btnEl.classList.add('uploading');
-  labelEl.textContent = 'Subiendo...';
-  try {
-    const url = await uploadProductImage(file);
-    previewEl.src = url;
-    previewEl.style.display = 'block';
-    const row = document.getElementById(`prod-row-${id}`);
-    row.querySelector('.pf-image').value = url;
-    labelEl.textContent = 'Cambiar foto';
-    btnEl.classList.remove('uploading');
-    await saveProduct(id); // guarda automáticamente al subir la foto
-  } catch (err) {
-    labelEl.textContent = 'Subir foto';
-    btnEl.classList.remove('uploading');
-    alert('No se pudo subir la foto: ' + err.message);
+async function saveModel(modelId) {
+  const card = document.getElementById(`model-card-${modelId}`);
+  const btn = document.getElementById(`save-model-btn-${modelId}`);
+  btn.disabled = true;
+
+  const modelPayload = {
+    category_id: card.querySelector('.mf-cat').value,
+    name: card.querySelector('.mf-name').value.trim(),
+    image_url: card.querySelector('.mf-image').value.trim() || null,
+    active: card.querySelector('.mf-active').checked,
+    updated_at: new Date().toISOString(),
+  };
+  const { error: modelErr } = await sb.from('cotizador_models').update(modelPayload).eq('id', modelId);
+  if (modelErr) { btn.disabled = false; alert('No se pudo guardar el modelo: ' + modelErr.message); return; }
+
+  const rows = card.querySelectorAll('.variant-row');
+  for (const row of rows) {
+    const variantId = row.dataset.variantId;
+    const payload = {
+      model_id: modelId,
+      size: row.querySelector('.vr-size').value.trim() || null,
+      color: row.querySelector('.vr-color').value.trim() || null,
+      price_usd: parseFloat(row.querySelector('.vr-usd').value) || 0,
+      reference_price_cop: parseFloat(row.querySelector('.vr-cop').value) || 0,
+      image_url: row.dataset.imageUrl || null,
+      active: true,
+      updated_at: new Date().toISOString(),
+    };
+    if (variantId) {
+      const { error } = await sb.from('cotizador_variants').update(payload).eq('id', variantId);
+      if (error) { btn.disabled = false; alert('No se pudo guardar una variante: ' + error.message); return; }
+    } else {
+      const newId = `${modelId}-${slugify(payload.size || 'v')}-${slugify(payload.color || '')}-${Date.now().toString(36)}`;
+      const { error } = await sb.from('cotizador_variants').insert({ id: newId, ...payload });
+      if (error) { btn.disabled = false; alert('No se pudo agregar una variante: ' + error.message); return; }
+    }
+  }
+
+  await loadData();
+  renderCategoryHome();
+  await loadAdminProducts();
+  const freshBtn = document.getElementById(`save-model-btn-${modelId}`);
+  if (freshBtn) {
+    freshBtn.classList.add('saved');
+    setTimeout(() => { freshBtn.classList.remove('saved'); freshBtn.disabled = false; }, 1200);
   }
 }
 
-async function saveProduct(id) {
-  const row = document.getElementById(`prod-row-${id}`);
-  const btn = document.getElementById(`save-btn-${id}`);
-  const payload = {
-    category_id: row.querySelector('.pf-cat').value,
-    name: row.querySelector('.pf-name').value.trim(),
-    variant: row.querySelector('.pf-variant').value.trim(),
-    image_url: row.querySelector('.pf-image').value.trim() || null,
-    price_usd: parseFloat(row.querySelector('.pf-usd').value) || 0,
-    reference_price_cop: parseFloat(row.querySelector('.pf-cop').value) || 0,
-    active: row.querySelector('.pf-active').checked,
-    updated_at: new Date().toISOString(),
-  };
-  btn.disabled = true;
-  const { error } = await sb.from('cotizador_products').update(payload).eq('id', id);
-  if (error) { btn.disabled = false; alert('No se pudo guardar: ' + error.message); return; }
-  await loadData(); // refresca el catálogo que usa el cotizador
-  renderCategoryHome();
-  const idx = adminProductsAll.findIndex(p => p.id === id);
-  if (idx !== -1) adminProductsAll[idx] = { ...adminProductsAll[idx], ...payload };
-  applyAdminProductFilter(); // vuelve a pintar la tarjeta para reflejar la nueva foto
-  btn.classList.add('saved');
-  setTimeout(() => {
-    btn.classList.remove('saved');
-    btn.disabled = false;
-  }, 1200);
-}
-
-async function deleteProduct(id) {
-  if (!confirm('¿Eliminar este producto del catálogo? Esta acción no se puede deshacer.')) return;
-  const { error } = await sb.from('cotizador_products').delete().eq('id', id);
+async function deleteModel(modelId) {
+  if (!confirm('¿Eliminar este modelo y TODAS sus variantes? Esta acción no se puede deshacer.')) return;
+  const { error } = await sb.from('cotizador_models').delete().eq('id', modelId);
   if (error) { alert('No se pudo eliminar: ' + error.message); return; }
   await loadData();
   renderCategoryHome();
@@ -1179,31 +1615,27 @@ function slugify(s) {
     .replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
 }
 
-async function addProduct() {
-  const errEl = document.getElementById('new-prod-error');
+async function addModel() {
+  const errEl = document.getElementById('new-model-error');
   errEl.textContent = '';
-  const category_id = document.getElementById('new-prod-cat').value;
-  const name = document.getElementById('new-prod-name').value.trim();
-  const variant = document.getElementById('new-prod-variant').value.trim();
-  const image_url = document.getElementById('new-prod-image').value.trim() || null;
-  const price_usd = parseFloat(document.getElementById('new-prod-usd').value);
-  const reference_price_cop = parseFloat(document.getElementById('new-prod-cop').value) || 0;
-  if (!name || !variant || isNaN(price_usd)) {
-    errEl.textContent = 'Completa nombre, variante y valor USA.';
+  const category_id = document.getElementById('new-model-cat').value;
+  const name = document.getElementById('new-model-name').value.trim();
+  const image_url = document.getElementById('new-model-image').value.trim() || null;
+  if (!name) {
+    errEl.textContent = 'Completa el nombre del modelo.';
     return;
   }
-  const id = `${slugify(category_id)}-${slugify(name)}-${slugify(variant)}-${Date.now().toString(36)}`;
-  const { error } = await sb.from('cotizador_products').insert({
-    id, category_id, name, variant, image_url, price_usd, reference_price_cop, active: true,
-  });
-  if (error) { errEl.textContent = 'No se pudo agregar: ' + error.message; return; }
-  ['new-prod-name', 'new-prod-variant', 'new-prod-image', 'new-prod-usd', 'new-prod-cop'].forEach(i => document.getElementById(i).value = '');
-  document.getElementById('new-prod-photo-preview').style.display = 'none';
-  document.getElementById('new-prod-photo-label').textContent = 'Subir foto';
-  document.getElementById('new-prod-photo-input').value = '';
+  const id = `${slugify(category_id)}-${slugify(name)}-${Date.now().toString(36)}`;
+  const { error } = await sb.from('cotizador_models').insert({ id, category_id, name, image_url, active: true });
+  if (error) { errEl.textContent = 'No se pudo crear: ' + error.message; return; }
+  document.getElementById('new-model-name').value = '';
+  document.getElementById('new-model-image').value = '';
+  document.getElementById('new-model-photo-preview').style.display = 'none';
+  document.getElementById('new-model-photo-label').textContent = 'Subir foto';
+  document.getElementById('new-model-photo-input').value = '';
   await loadData();
-  await loadAdminProducts();
   renderCategoryHome();
+  await loadAdminProducts();
 }
 
 async function loadAdminConfig() {
@@ -1273,19 +1705,19 @@ async function saveTiers() {
 }
 
 document.getElementById('admin-open').addEventListener('click', showAdminView);
-document.getElementById('admin-prod-search').addEventListener('input', (e) => {
-  adminProductSearch = e.target.value;
-  applyAdminProductFilter();
+document.getElementById('admin-model-search').addEventListener('input', (e) => {
+  adminModelSearch = e.target.value;
+  applyAdminModelFilter();
 });
 document.getElementById('admin-close').addEventListener('click', hideAdminView);
 document.getElementById('admin-login-btn').addEventListener('click', adminLogin);
 document.getElementById('admin-logout').addEventListener('click', adminLogout);
-document.getElementById('new-prod-add').addEventListener('click', addProduct);
-document.getElementById('new-prod-photo-input').addEventListener('change', async (e) => {
+document.getElementById('new-model-add').addEventListener('click', addModel);
+document.getElementById('new-model-photo-input').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
-  const labelEl = document.getElementById('new-prod-photo-label');
-  const previewEl = document.getElementById('new-prod-photo-preview');
+  const labelEl = document.getElementById('new-model-photo-label');
+  const previewEl = document.getElementById('new-model-photo-preview');
   const btnEl = labelEl.closest('.photo-upload-btn');
   btnEl.classList.add('uploading');
   labelEl.textContent = 'Subiendo...';
@@ -1293,7 +1725,7 @@ document.getElementById('new-prod-photo-input').addEventListener('change', async
     const url = await uploadProductImage(file);
     previewEl.src = url;
     previewEl.style.display = 'block';
-    document.getElementById('new-prod-image').value = url;
+    document.getElementById('new-model-image').value = url;
     labelEl.textContent = 'Cambiar foto';
   } catch (err) {
     labelEl.textContent = 'Subir foto';
@@ -1308,22 +1740,17 @@ document.querySelectorAll('.admin-tabs .tab').forEach(btn => {
   btn.addEventListener('click', () => switchAdminTab(btn.dataset.admintab));
 });
 
-
-document.getElementById('back-link').addEventListener('click', () => {
-  activeCategory = null;
-  renderProducts();
-});
+document.getElementById('add-another-btn').addEventListener('click', goHome);
 
 async function boot() {
   try {
     await loadData();
-    renderCategoryHome();
-    renderTabs();
-    renderProducts();
-    await refreshTRM(); // trae la TRM en vivo (o cae al respaldo) y refresca el carrito
+    document.getElementById('loading-msg').style.display = 'none';
+    setStep('home');
+    await refreshTRM(); // trae la TRM en vivo (o cae al respaldo) y refresca el total si ya hay carrito
   } catch (err) {
-    document.getElementById('products').innerHTML = `
-      <div class="state-msg err">
+    document.getElementById('loading-msg').outerHTML = `
+      <div class="state-msg err" id="loading-msg">
         No se pudo cargar el catálogo. Revisa la conexión a Supabase.<br>
         <button class="retry" id="retry-btn">Reintentar</button>
       </div>`;
