@@ -232,9 +232,6 @@
     header .logo{height:28px;}
     header h1{font-size:17px;}
     main{flex-direction:row;padding:28px 40px;gap:24px;align-items:flex-start;}
-    .wizard-wrap{max-width:680px;margin:0 auto;}
-    .cat-home{grid-template-columns:repeat(3,1fr);}
-    .model-grid{grid-template-columns:repeat(3,1fr);}
     #admin-view{padding:28px 40px;}
     .add-grid{grid-template-columns:repeat(3,1fr);}
     .add-grid .btn-primary{grid-column:1/-1;}
@@ -364,6 +361,56 @@
   .variant-row .vr-remove{color:#C0392B;background:none;border:none;display:flex;align-items:center;justify-content:center;}
   .add-variant-btn{margin-top:4px;background:#fff;border:1.5px dashed var(--border);color:var(--azul);
     border-radius:10px;padding:9px;width:100%;font-size:12.5px;font-weight:700;font-family:inherit;}
+  /* ================= WIZARD: base móvil + escritorio ================= */
+  .wizard-wrap{width:100%;}
+  .home-layout{display:block;}
+  .home-sub{font-size:14px;color:var(--gray);margin:-12px 0 20px;}
+  .home-side{margin-top:28px;}
+  .side-title{font-size:11px;font-weight:700;color:var(--gray);letter-spacing:.4px;margin-bottom:8px;}
+  .variant-layout{display:block;}
+  .variant-photo{height:280px;border-radius:24px;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:24px;}
+  .variant-photo img{width:100%;height:100%;object-fit:cover;}
+  .vp-empty{font-size:13px;font-weight:700;}
+  .variant-head img, .variant-head .vh-badge{display:none;}
+  .variant-head{margin-bottom:22px;}
+  .vh-sub{font-size:13px;color:var(--gray);margin-top:4px;}
+  @media (min-width:960px){
+    .wizard-wrap{max-width:1240px;margin:0 auto;padding:52px 40px 80px;}
+    #step-result{max-width:760px;margin:0 auto;}
+    .home-layout{display:grid;grid-template-columns:1fr 360px;gap:56px;align-items:start;}
+    .home-title{font-size:38px;letter-spacing:-.8px;margin-bottom:10px;}
+    .home-sub{font-size:15px;margin:0 0 28px;}
+    .q-search{padding:20px 24px;border-radius:18px;margin-bottom:8px;}
+    .q-search input{font-size:17px;}
+    .q-label{margin-top:30px;}
+    .cat-home{grid-template-columns:repeat(3,1fr);gap:16px;}
+    .cat-card{padding:24px;border-radius:22px;gap:14px;}
+    .cat-card .badge{width:46px;height:46px;border-radius:13px;font-size:13px;}
+    .cat-card-name{font-size:16px;}
+    .cat-card-count{font-size:12.5px;}
+    .home-side{margin-top:0;border:1px solid var(--border);border-radius:24px;padding:24px 24px 12px;}
+    .side-title{font-size:13px;font-weight:800;color:var(--ink);letter-spacing:0;margin-bottom:6px;}
+    .recent-row{padding:12px 0;}
+    .model-grid{grid-template-columns:repeat(4,1fr);gap:16px;}
+    .model-card{padding:16px;border-radius:22px;}
+    .model-card .m-thumb, .model-card .m-badge{height:150px;border-radius:16px;}
+    .model-card .m-name{font-size:14.5px;}
+    .variant-layout{display:grid;grid-template-columns:600px 1fr;gap:64px;}
+    .variant-photo{height:560px;border-radius:32px;margin-bottom:0;}
+    .variant-panel{padding-top:12px;}
+    .variant-head{margin-bottom:36px;}
+    .vh-name{font-size:40px;letter-spacing:-.8px;}
+    .vh-sub{font-size:15px;}
+    .q-block{margin-bottom:34px;}
+    .q-block-title{font-size:14px;}
+    .pill-btn{padding:13px 24px;font-size:14.5px;}
+    .swatch-circle{width:38px;height:38px;}
+    .color-swatches{gap:18px;}
+    .swatch-label{font-size:11.5px;}
+    .sticky-price-bar{padding:24px 28px;border-radius:22px;margin-top:40px;}
+    .sticky-price-bar .vp-price{font-size:30px;}
+    .sticky-price-bar button{padding:17px 40px;font-size:15.5px;border-radius:15px;}
+  }
 </style>
 </head>
 <body>
@@ -397,19 +444,24 @@
 
       <!-- PASO: inicio -->
       <div id="step-home" style="display:none;">
-        <div class="q-title">¿Qué vas a cotizar hoy?</div>
-        <div class="search q-search">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A8A8E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input id="search-input" type="text" placeholder="iPhone, iPad, Ray-Ban Meta...">
-        </div>
-        <div id="search-suggestions" class="suggest-list"></div>
-        <div id="home-browse">
-          <div class="q-label">O ELIGE UNA CATEGORÍA</div>
-          <div class="cat-home" id="category-home"></div>
-          <div id="recent-wrap">
-            <div class="q-label" style="margin-top:28px;">ÚLTIMAS COTIZADAS</div>
-            <div class="recent-list" id="recent-list"></div>
+        <div class="home-layout">
+          <div class="home-main">
+            <div class="q-title home-title">¿Qué vas a cotizar hoy?</div>
+            <div class="home-sub">Busca un producto o entra por categoría.</div>
+            <div class="search q-search">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8A8A8E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input id="search-input" type="text" placeholder="iPhone, iPad, Ray-Ban Meta...">
+            </div>
+            <div id="search-suggestions" class="suggest-list"></div>
+            <div id="home-browse">
+              <div class="q-label">CATEGORÍAS</div>
+              <div class="cat-home" id="category-home"></div>
+            </div>
           </div>
+          <aside id="recent-wrap" class="home-side">
+            <div class="side-title">Últimas cotizadas</div>
+            <div class="recent-list" id="recent-list"></div>
+          </aside>
         </div>
       </div>
 
@@ -423,10 +475,15 @@
       <!-- PASO: variante -->
       <div id="step-variant" style="display:none;">
         <div class="breadcrumb" id="variant-breadcrumb"></div>
-        <div class="variant-head" id="variant-head"></div>
-        <div id="variant-size-section"></div>
-        <div id="variant-color-section"></div>
-        <div class="sticky-price-bar" id="variant-price-bar"></div>
+        <div class="variant-layout">
+          <div class="variant-photo" id="variant-photo"></div>
+          <div class="variant-panel">
+            <div class="variant-head" id="variant-head"></div>
+            <div id="variant-size-section"></div>
+            <div id="variant-color-section"></div>
+            <div class="sticky-price-bar" id="variant-price-bar"></div>
+          </div>
+        </div>
       </div>
 
       <!-- PASO: resultado -->
@@ -933,9 +990,14 @@ function renderVariantStep() {
   const thumbHtml = m.image_url
     ? `<img src="${m.image_url}" alt="">`
     : `<div class="vh-badge" style="background:${col.bg};color:${col.fg};">${initials(m.name)}</div>`;
-  document.getElementById('variant-head').innerHTML = `${thumbHtml}<div class="vh-name">${m.name}</div>`;
-
   const vs = modelVariants(m.id);
+  const nSizes = new Set(vs.map(v => v.size || '').filter(Boolean)).size;
+  const nColors = new Set(vs.map(v => v.color || '').filter(Boolean)).size;
+  const subParts = [];
+  if (nSizes > 1) subParts.push(`${nSizes} tamaños`);
+  if (nColors > 1) subParts.push(`${nColors} colores`);
+  document.getElementById('variant-head').innerHTML =
+    `${thumbHtml}<div><div class="vh-name">${m.name}</div>${subParts.length ? `<div class="vh-sub">${subParts.join(' · ')}</div>` : ''}</div>`;
   const sizes = [...new Set(vs.map(v => v.size || '').filter(s => s !== ''))];
   const hasSizeQuestion = sizes.length > 1;
   if (!hasSizeQuestion) wizardSize = sizes.length === 1 ? sizes[0] : null;
@@ -985,6 +1047,13 @@ function renderVariantStep() {
     (sizes.length === 0 || (v.size || '') === wizardSize) &&
     (colors.length === 0 || (v.color || '') === wizardColor)
   );
+  const matching = vs.filter(v => (!wizardSize || (v.size || '') === wizardSize) && (!wizardColor || (v.color || '') === wizardColor));
+  const photoVar = (resolved && resolved.image_url) ? resolved : matching.find(v => v.image_url);
+  const photoUrl = (photoVar && photoVar.image_url) || m.image_url;
+  const photoEl = document.getElementById('variant-photo');
+  photoEl.style.background = col.bg;
+  photoEl.innerHTML = photoUrl ? `<img src="${photoUrl}" alt="">` : `<div class="vp-empty" style="color:${col.fg};">Sin foto</div>`;
+
   const bar = document.getElementById('variant-price-bar');
   if (resolved) {
     const label = [wizardSize, wizardColor].filter(Boolean).join(' · ') || m.name;
