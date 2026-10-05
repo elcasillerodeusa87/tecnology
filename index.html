@@ -420,6 +420,17 @@
   .catadm-row .catadm-name{flex-grow:1;font-size:15px;font-weight:700;}
   .catadm-row .catadm-actions{display:flex;gap:8px;align-items:center;}
   @media (min-width:960px){ .cat-photo{height:140px;border-radius:16px;} }
+  .admin-savebar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    background:#fff;border:1px solid var(--border);border-radius:14px;padding:10px 14px;margin-bottom:16px;
+    box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .save-status{font-size:13px;font-weight:700;}
+  .save-status.saved{color:var(--success-text);}
+  .save-status.dirty{color:#B45309;}
+  .save-status.saving{color:var(--gray);}
+  .save-status.error{color:var(--coral-dark);}
+  .save-btn{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:13px;font-weight:700;}
+  .save-btn.saved{background:var(--success);}
+  .save-btn:disabled{opacity:.6;}
 </style>
 </head>
 <body>
@@ -588,6 +599,10 @@
     </div>
 
     <div id="admin-productos">
+      <div class="admin-savebar">
+        <span class="save-status saved" id="admin-save-status">✓ Todo guardado</span>
+        <button class="save-btn" id="admin-save-all">Guardar todo</button>
+      </div>
       <div class="admin-card">
         <h3>Agregar modelo</h3>
         <div class="add-grid" style="grid-template-columns:1fr 1.6fr;">
@@ -1492,19 +1507,57 @@ async function saveCategoryPhoto(categoryId, url) {
 
 async function loadAdminPanel() {
   renderAdminCatPhotos();
+  refreshSaveStatus();
   populateCategorySelect(document.getElementById('new-model-cat'));
   renderAdminCatFilter();
   await Promise.all([loadAdminProducts(), loadAdminConfig(), loadAdminTiers()]);
 }
 
-async function loadAdminProducts() {
+async function syncAdminState() {
   const [{ data: modelRows, error: e1 }, { data: variantRows, error: e2 }] = await Promise.all([
     sb.from('cotizador_models').select('*').order('category_id').order('name'),
     sb.from('cotizador_variants').select('*').order('sort_order'),
   ]);
   if (e1 || e2) { console.error(e1 || e2); return; }
   adminModelsAll = modelRows.map(m => ({ ...m, variants: variantRows.filter(v => v.model_id === m.id) }));
+}
+
+async function loadAdminProducts() {
+  await syncAdminState();
   applyAdminModelFilter();
+}
+
+// ---- guardado automático ----
+const dirtyModels = new Set();
+const savingModels = new Set();
+const savePending = new Set();
+const saveTimers = {};
+
+function setSaveStatus(state, msg) {
+  const el = document.getElementById('admin-save-status');
+  if (!el) return;
+  el.className = 'save-status ' + state;
+  el.textContent = state === 'saved' ? '✓ Todo guardado'
+    : state === 'dirty' ? '● Cambios sin guardar…'
+    : state === 'saving' ? 'Guardando…'
+    : '⚠ ' + (msg || 'No se pudo guardar') + ' — toca "Guardar todo" para reintentar';
+}
+function refreshSaveStatus() {
+  if (savingModels.size) setSaveStatus('saving');
+  else if (dirtyModels.size) setSaveStatus('dirty');
+  else setSaveStatus('saved');
+}
+function markDirty(modelId) {
+  dirtyModels.add(modelId);
+  setSaveStatus('dirty');
+  clearTimeout(saveTimers[modelId]);
+  saveTimers[modelId] = setTimeout(() => saveModel(modelId), 900);
+}
+async function flushAdminSaves() {
+  const ids = [...dirtyModels];
+  ids.forEach(id => clearTimeout(saveTimers[id]));
+  for (const id of ids) await saveModel(id);
+  while (savingModels.size) await new Promise(r => setTimeout(r, 100));
 }
 
 function categoryName(id) {
@@ -1519,8 +1572,9 @@ function renderAdminCatFilter() {
     <button class="${c.id === adminCategoryFilter ? 'active' : ''}" data-cat="${c.id}">${c.name}</button>
   `).join('');
   el.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       adminCategoryFilter = btn.dataset.cat;
+      await flushAdminSaves();
       renderAdminCatFilter();
       applyAdminModelFilter();
     });
@@ -1574,6 +1628,7 @@ function wireVariantRow(row) {
       const icon = row.querySelector('.vr-photo-icon');
       img.src = url; img.style.display = '';
       icon.style.display = 'none';
+      markDirty(row.dataset.model);
     } catch (err) {
       alert('No se pudo subir la foto: ' + err.message);
     }
@@ -1603,6 +1658,7 @@ function wireVariantRow(row) {
       if (error) { alert('No se pudo eliminar: ' + error.message); return; }
       await loadData();
       renderCategoryHome();
+      await syncAdminState();
     }
     row.remove();
   });
@@ -1661,10 +1717,8 @@ function renderAdminModels(list) {
         </div>
         <button class="add-variant-btn" data-addvariant="${m.id}">+ Agregar variante</button>
 
-        <div class="actions" style="margin-top:14px;">
-          <button class="icon-btn" id="save-model-btn-${m.id}" data-savemodel="${m.id}" aria-label="Guardar">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          </button>
+        <div class="actions" style="margin-top:14px;display:flex;justify-content:flex-end;align-items:center;gap:10px;">
+          <button class="save-btn" id="save-model-btn-${m.id}" data-savemodel="${m.id}">Guardar</button>
           <button class="icon-btn danger" data-delmodel="${m.id}" aria-label="Eliminar modelo">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
           </button>
@@ -1691,6 +1745,7 @@ function renderAdminModels(list) {
         previewEl.src = url; previewEl.style.display = 'block';
         card.querySelector('.mf-image').value = url;
         labelEl.textContent = 'Cambiar foto';
+        markDirty(m.id);
       } catch (err) {
         alert('No se pudo subir la foto: ' + err.message);
       }
@@ -1714,54 +1769,71 @@ async function uploadProductImage(file) {
 
 async function saveModel(modelId) {
   const card = document.getElementById(`model-card-${modelId}`);
+  if (!card) { dirtyModels.delete(modelId); refreshSaveStatus(); return; }
+  if (savingModels.has(modelId)) { savePending.add(modelId); return; }
+  clearTimeout(saveTimers[modelId]);
+  savingModels.add(modelId);
+  dirtyModels.delete(modelId);
+  setSaveStatus('saving');
   const btn = document.getElementById(`save-model-btn-${modelId}`);
-  btn.disabled = true;
-
-  const modelPayload = {
-    category_id: card.querySelector('.mf-cat').value,
-    name: card.querySelector('.mf-name').value.trim(),
-    image_url: card.querySelector('.mf-image').value.trim() || null,
-    active: card.querySelector('.mf-active').checked,
-    updated_at: new Date().toISOString(),
-  };
-  const { error: modelErr } = await sb.from('cotizador_models').update(modelPayload).eq('id', modelId);
-  if (modelErr) { btn.disabled = false; alert('No se pudo guardar el modelo: ' + modelErr.message); return; }
-
-  const rows = card.querySelectorAll('.variant-row');
-  for (const row of rows) {
-    const variantId = row.dataset.variantId;
-    const payload = {
-      model_id: modelId,
-      size: row.querySelector('.vr-size').value.trim() || null,
-      color: row.querySelector('.vr-color').value.trim() || null,
-      price_usd: parseFloat(row.querySelector('.vr-usd').value) || 0,
-      reference_price_cop: parseFloat(row.querySelector('.vr-cop').value) || 0,
-      image_url: row.dataset.imageUrl || null,
-      active: true,
+  try {
+    const { error: modelErr } = await sb.from('cotizador_models').update({
+      category_id: card.querySelector('.mf-cat').value,
+      name: card.querySelector('.mf-name').value.trim(),
+      image_url: card.querySelector('.mf-image').value.trim() || null,
+      active: card.querySelector('.mf-active').checked,
       updated_at: new Date().toISOString(),
-    };
-    if (variantId) {
-      const { error } = await sb.from('cotizador_variants').update(payload).eq('id', variantId);
-      if (error) { btn.disabled = false; alert('No se pudo guardar una variante: ' + error.message); return; }
-    } else {
-      const newId = `${modelId}-${slugify(payload.size || 'v')}-${slugify(payload.color || '')}-${Date.now().toString(36)}`;
-      const { error } = await sb.from('cotizador_variants').insert({ id: newId, ...payload });
-      if (error) { btn.disabled = false; alert('No se pudo agregar una variante: ' + error.message); return; }
-    }
-  }
+    }).eq('id', modelId);
+    if (modelErr) throw modelErr;
 
-  await loadData();
-  renderCategoryHome();
-  await loadAdminProducts();
-  const freshBtn = document.getElementById(`save-model-btn-${modelId}`);
-  if (freshBtn) {
-    freshBtn.classList.add('saved');
-    setTimeout(() => { freshBtn.classList.remove('saved'); freshBtn.disabled = false; }, 1200);
+    for (const row of card.querySelectorAll('.variant-row')) {
+      const size = row.querySelector('.vr-size').value.trim() || null;
+      const color = row.querySelector('.vr-color').value.trim() || null;
+      const price_usd = parseFloat(row.querySelector('.vr-usd').value) || 0;
+      const variantId = row.dataset.variantId;
+      if (!variantId && !size && !color && !price_usd) continue; // fila vacía: no se guarda
+      const payload = {
+        model_id: modelId, size, color, price_usd,
+        reference_price_cop: parseFloat(row.querySelector('.vr-cop').value) || 0,
+        image_url: row.dataset.imageUrl || null,
+        active: true,
+        updated_at: new Date().toISOString(),
+      };
+      if (variantId) {
+        const { error } = await sb.from('cotizador_variants').update(payload).eq('id', variantId);
+        if (error) throw error;
+      } else {
+        const newId = `${modelId}-${slugify(size || 'v')}-${slugify(color || '')}-${Date.now().toString(36)}`;
+        const { error } = await sb.from('cotizador_variants').insert({ id: newId, ...payload });
+        if (error) throw error;
+        row.dataset.variantId = newId; // la fila ya existe en la base: próximos guardados la actualizan
+      }
+    }
+
+    await syncAdminState();
+    await loadData();
+    renderCategoryHome();
+    if (btn) {
+      btn.textContent = 'Guardado ✓';
+      btn.classList.add('saved');
+      setTimeout(() => { btn.textContent = 'Guardar'; btn.classList.remove('saved'); }, 1400);
+    }
+  } catch (err) {
+    console.error(err);
+    dirtyModels.add(modelId);
+    savingModels.delete(modelId);
+    setSaveStatus('error', err.message);
+    return;
   }
+  savingModels.delete(modelId);
+  if (savePending.delete(modelId)) await saveModel(modelId);
+  else refreshSaveStatus();
 }
 
 async function deleteModel(modelId) {
   if (!confirm('¿Eliminar este modelo y TODAS sus variantes? Esta acción no se puede deshacer.')) return;
+  dirtyModels.delete(modelId); clearTimeout(saveTimers[modelId]);
+  await flushAdminSaves();
   const { error } = await sb.from('cotizador_models').delete().eq('id', modelId);
   if (error) { alert('No se pudo eliminar: ' + error.message); return; }
   await loadData();
@@ -1784,6 +1856,7 @@ async function addModel() {
     errEl.textContent = 'Completa el nombre del modelo.';
     return;
   }
+  await flushAdminSaves();
   const id = `${slugify(category_id)}-${slugify(name)}-${Date.now().toString(36)}`;
   const { error } = await sb.from('cotizador_models').insert({ id, category_id, name, image_url, active: true });
   if (error) { errEl.textContent = 'No se pudo crear: ' + error.message; return; }
@@ -1864,13 +1937,23 @@ async function saveTiers() {
 }
 
 document.getElementById('admin-open').addEventListener('click', showAdminView);
-document.getElementById('admin-model-search').addEventListener('input', (e) => {
+document.getElementById('admin-model-search').addEventListener('input', async (e) => {
   adminModelSearch = e.target.value;
+  await flushAdminSaves();
   applyAdminModelFilter();
 });
-document.getElementById('admin-close').addEventListener('click', hideAdminView);
+['input', 'change'].forEach(ev => document.getElementById('admin-model-list').addEventListener(ev, (e) => {
+  if (e.target.type === 'file') return;
+  const card = e.target.closest('.model-admin-card');
+  if (card) markDirty(card.id.replace('model-card-', ''));
+}));
+document.getElementById('admin-save-all').addEventListener('click', flushAdminSaves);
+window.addEventListener('beforeunload', (e) => {
+  if (dirtyModels.size || savingModels.size) { e.preventDefault(); e.returnValue = ''; }
+});
+document.getElementById('admin-close').addEventListener('click', async () => { await flushAdminSaves(); hideAdminView(); });
 document.getElementById('admin-login-btn').addEventListener('click', adminLogin);
-document.getElementById('admin-logout').addEventListener('click', adminLogout);
+document.getElementById('admin-logout').addEventListener('click', async () => { await flushAdminSaves(); adminLogout(); });
 document.getElementById('new-model-add').addEventListener('click', addModel);
 document.getElementById('new-model-photo-input').addEventListener('change', async (e) => {
   const file = e.target.files[0];
