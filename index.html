@@ -598,6 +598,13 @@
           </div>
         </details>
 
+        <div id="embed-pedido" style="display:none;margin-bottom:10px;">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+            <label for="embed-user" style="font-size:12px;font-weight:600;color:var(--gray);white-space:nowrap;">Ingresado por</label>
+            <select id="embed-user" style="flex:1;border:1px solid var(--bg2);border-radius:12px;padding:10px;font-family:inherit;font-size:14px;"><option>Daniela</option><option>Ruben</option></select>
+          </div>
+          <button class="primary-btn" id="embed-pedido-btn" style="margin-bottom:0;background:#EC3E40;">Crear pedido</button>
+        </div>
         <button class="primary-btn" id="save-quote-btn">Guardar cotización</button>
         <button class="share-btn" id="share-btn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21l1.65-3.8a9 9 0 1 1 3.4 2.9z"></path></svg>
@@ -911,6 +918,8 @@ function renderTRMBadge() {
     note.textContent = `En vivo: ${formatCOP(marketTrm)} + $150`;
   } else if (trmSource === 'manual') {
     note.textContent = 'Sin conexión a la TRM en vivo — usando el valor de respaldo';
+  } else if (trmSource === 'parent') {
+    note.textContent = 'TRM del cotizador general';
   } else {
     note.textContent = '';
   }
@@ -1379,8 +1388,9 @@ function snapshotCart() {
     const v = variants.find(x => x.id === entry.variantId);
     const m = modelById(v.model_id);
     const vl = [v.size, v.color].filter(Boolean).join(' · ');
-    const { saleCop } = calcProduct(v);
+    const { saleCop, costCop } = calcProduct(v);
     return {
+      name: m.name, size: v.size || '', color: v.color || '', cost_cop: Math.round(costCop * entry.qty),
       variant_id: v.id, label: vl ? `${m.name} ${vl}` : m.name, qty: entry.qty,
       image_url: v.image_url || m.image_url || null,
       unit_cop: Math.round(saleCop), line_cop: Math.round(saleCop * entry.qty),
@@ -2248,11 +2258,55 @@ document.getElementById('qd-download').addEventListener('click', () => {
   if (q) downloadQuoteImage({ client_name: q.client_name, items: q.items, discount_pct: q.discount_pct, subtotal_cop: q.subtotal_cop, total_cop: q.total_cop, trm: q.trm, created_at: q.created_at }, document.getElementById('qd-download'));
 });
 
+// ---- Modo embebido: dentro del cotizador general (usa su TRM y crea pedidos en Por Pedir) ----
+const EMBED = window.parent !== window;
+let embedInit = false;
+function toParent(msg) {
+  let origin = '*';
+  try { origin = (location.ancestorOrigins && location.ancestorOrigins[0]) || (document.referrer ? new URL(document.referrer).origin : '*'); } catch (e) {}
+  window.parent.postMessage(Object.assign({ src: 'casillero-tec' }, msg), origin);
+}
+if (EMBED) {
+  document.getElementById('embed-pedido').style.display = '';
+  document.getElementById('trm-refresh').style.display = 'none';
+  window.addEventListener('message', (ev) => {
+    if (ev.source !== window.parent) return;
+    const d = ev.data;
+    if (!d || d.src !== 'casillero') return;
+    if (d.type === 'init') {
+      if (d.trm > 0) { trm = d.trm; trmSource = 'parent'; embedInit = true; renderTRMBadge(); if (typeof renderCart === 'function') renderCart(); }
+      if (d.user) document.getElementById('embed-user').value = d.user;
+    }
+    if (d.type === 'pedido-resultado') {
+      const b = document.getElementById('embed-pedido-btn');
+      b.disabled = false; b.textContent = 'Crear pedido';
+      toast(d.ok ? 'Pedido creado ✓ — ya está en Por Pedir' : (d.msg || 'No se pudo crear el pedido'));
+    }
+  });
+  let lastPedidoSig = '';
+  document.getElementById('embed-pedido-btn').addEventListener('click', () => {
+    if (cart.length === 0) { toast('Agrega productos primero'); return; }
+    const snap = snapshotCart();
+    if (!snap.client_name) { toast('Escribe el nombre del cliente'); document.getElementById('client-name').focus(); return; }
+    const sig = JSON.stringify([snap.client_name, snap.items.map(i => [i.variant_id, i.qty]), snap.discount_pct]);
+    if (sig === lastPedidoSig && !confirm('Ya creaste un pedido con esta cotización. ¿Crear otro?')) return;
+    lastPedidoSig = sig;
+    const b = document.getElementById('embed-pedido-btn');
+    b.disabled = true; b.textContent = 'Creando…';
+    toParent({ type: 'crear-pedido', snap, user: document.getElementById('embed-user').value });
+  });
+  document.getElementById('embed-user').addEventListener('change', (e) => toParent({ type: 'user', user: e.target.value }));
+}
+
 async function boot() {
   try {
     await loadData();
     document.getElementById('loading-msg').style.display = 'none';
     setStep('home');
+    if (EMBED) {
+      toParent({ type: 'ready' });
+      setTimeout(() => { if (!embedInit) refreshTRM(); }, 4000); // respaldo si el padre no responde
+    } else
     await refreshTRM(); // trae la TRM en vivo (o cae al respaldo) y refresca el total si ya hay carrito
   } catch (err) {
     document.getElementById('loading-msg').outerHTML = `
